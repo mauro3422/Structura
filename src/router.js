@@ -39,6 +39,10 @@ export class Router {
 
       setTimeout(() => {
         const content = handler(params);
+        
+        // Fix: Reset scroll to top on route change
+        window.scrollTo(0, 0);
+
         if (typeof content === 'string') {
           this.container.innerHTML = content;
         } else if (content instanceof HTMLElement) {
