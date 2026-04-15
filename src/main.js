@@ -84,6 +84,65 @@ function setupInteractivity() {
   setupAddColumnButtons();
   setupSearchAnimations();
   setupGlossarySearch();
+  setupTimelineSliders();
+}
+
+// --- Timeline Interactivity ---
+function setupTimelineSliders() {
+  document.querySelectorAll('.timeline-slider').forEach(slider => {
+    if (slider.dataset.bound) return;
+    slider.dataset.bound = 'true';
+
+    const track = slider.querySelector('.timeline-slider__track');
+    const prevBtn = slider.querySelector('.timeline-btn-prev');
+    const nextBtn = slider.querySelector('.timeline-btn-next');
+    const dots = slider.querySelectorAll('.timeline-dot');
+    
+    const slides = slider.querySelectorAll('.timeline-slide');
+    
+    let current = parseInt(slider.dataset.current, 10);
+    const total = parseInt(slider.dataset.total, 10);
+
+    const updateSlider = () => {
+      // Move track
+      track.style.transform = `translateX(-${current * 100}%)`;
+      
+      // Update buttons
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === total - 1;
+
+      // Update dots & slides
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === current);
+      });
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === current);
+      });
+      
+      slider.dataset.current = current;
+    };
+
+    prevBtn.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        updateSlider();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (current < total - 1) {
+        current++;
+        updateSlider();
+      }
+    });
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        current = index;
+        updateSlider();
+      });
+    });
+  });
 }
 
 // --- Quiz Interactions ---

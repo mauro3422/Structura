@@ -271,21 +271,39 @@ function renderQuiz(section, index, lessonId) {
 }
 
 function renderTimeline(section, index) {
-  const events = section.events.map((event, i) => `
-    <div class="timeline-event" style="animation: slideUp 0.4s both ${i * 0.1}s">
-      <div class="timeline-event__marker">
-        <span class="timeline-event__icon">${event.icon}</span>
-        <div class="timeline-event__line"></div>
+  const timelineId = `timeline-${index}`;
+  
+  const slides = section.events.map((event, i) => `
+    <div class="timeline-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
+      <div class="timeline-slide__header">
+        <span class="timeline-slide__year">${event.year}</span>
+        <span class="timeline-slide__icon">${event.icon}</span>
       </div>
-      <div class="timeline-event__content">
-        <span class="timeline-event__year">${event.year}</span>
-        <h3 class="timeline-event__title">${event.title}</h3>
-        <p class="timeline-event__desc">${event.description}</p>
-      </div>
+      <h3 class="timeline-slide__title">${event.title}</h3>
+      <p class="timeline-slide__desc">${event.description}</p>
     </div>
   `).join('');
 
-  return `<div class="timeline" style="margin: var(--sp-4) 0">${events}</div>`;
+  const dots = section.events.map((_, i) => `
+    <button class="timeline-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></button>
+  `).join('');
+
+  return `
+    <div class="timeline-slider" id="${timelineId}" data-current="0" data-total="${section.events.length}">
+      <div class="timeline-slider__viewport">
+        <div class="timeline-slider__track" id="${timelineId}-track">
+          ${slides}
+        </div>
+      </div>
+      <div class="timeline-slider__controls">
+        <button class="btn btn-secondary timeline-btn-prev" id="${timelineId}-prev" disabled>←</button>
+        <div class="timeline-slider__dots" id="${timelineId}-dots">
+          ${dots}
+        </div>
+        <button class="btn btn-primary timeline-btn-next" id="${timelineId}-next">Siguiente →</button>
+      </div>
+    </div>
+  `;
 }
 
 function renderStats(section, index) {
