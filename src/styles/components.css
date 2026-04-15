@@ -613,12 +613,14 @@
 }
 
 .diagram-wrapper .mermaid {
-  display: inline-block;
-  max-width: 100%;
+  display: block;
+  min-width: min-content;
 }
 
 .diagram-wrapper .mermaid svg {
-  max-width: 100%;
+  max-width: none;
+  width: 100%;
+  min-width: 600px; /* Force minimum width to prevent unreadable squishing on mobile */
   height: auto;
 }
 
