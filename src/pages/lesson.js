@@ -274,11 +274,12 @@ function renderTimeline(section, index) {
   const treeId = `interactive-tree-${index}`;
   
   const nodes = section.events.map((event, i) => `
-    <div class="tree-node ${i === 0 ? 'visible' : ''}" data-index="${i}">
+    <div class="tree-node ${i === 0 ? 'visible focused' : ''} ${i % 2 === 0 ? 'node-even' : 'node-odd'}" data-index="${i}">
       ${i > 0 ? '<div class="tree-line"></div>' : ''}
       <div class="tree-content">
         <button class="tree-icon-btn glow-effect" data-target="${i + 1}">
           <span class="tree-icon">${event.icon}</span>
+          <span class="tree-peek-year">${event.year}</span>
         </button>
         <div class="tree-card">
           <div class="tree-year">${event.year}</div>

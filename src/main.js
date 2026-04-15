@@ -97,6 +97,16 @@ function setupInteractiveTree() {
     
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
+        const thisNode = btn.closest('.tree-node');
+        
+        // If clicking an already revealed node, just toggle its focus
+        if (thisNode.classList.contains('visible') && !btn.dataset.clicked) {
+           tree.querySelectorAll('.tree-node.focused').forEach(n => {
+             if(n !== thisNode) n.classList.remove('focused');
+           });
+           thisNode.classList.toggle('focused');
+        }
+
         const targetIndex = parseInt(btn.dataset.target, 10);
         const nextNode = tree.querySelector(`.tree-node[data-index="${targetIndex}"]`);
         
@@ -104,13 +114,20 @@ function setupInteractiveTree() {
           // Play click haptic feedback
           btn.style.transform = 'scale(0.9)';
           setTimeout(() => btn.style.transform = 'scale(1)', 150);
+          btn.dataset.clicked = 'true';
 
-          // Reveal the next node and its growing line
-          nextNode.classList.add('visible');
+           // Collapse all currently focused nodes
+          tree.querySelectorAll('.tree-node.focused').forEach(node => {
+            node.classList.remove('focused');
+          });
+
+          // Reveal the next node and make it focused
+          nextNode.classList.add('visible', 'focused');
           
           // Optionally scroll to it so it stays in viewport on mobile
           setTimeout(() => {
             nextNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            delete btn.dataset.clicked;
           }, 300);
         }
       });

@@ -242,6 +242,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .tree-node {
@@ -253,12 +254,12 @@
   opacity: 0;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 1s linear; /* Smoothly unrolls height */
+  transition: max-height 1.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .tree-node.visible {
   opacity: 1;
-  max-height: 600px; /* High enough for content */
+  max-height: 800px; /* High enough for content */
   overflow: visible;
 }
 
@@ -292,6 +293,14 @@
   animation: slideDownFade 0.6s ease forwards 0.3s;
 }
 
+/* Wavy alternating layout */
+.tree-node.node-even .tree-content {
+  margin-left: 20px;
+}
+.tree-node.node-odd .tree-content {
+  margin-right: 20px;
+}
+
 @keyframes slideDownFade {
   to { transform: translateY(0); opacity: 1; }
 }
@@ -303,17 +312,49 @@
   width: 56px;
   height: 56px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
   cursor: pointer;
   z-index: 2;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.tree-icon {
+  font-size: 1.5rem;
+}
+
+.tree-peek-year {
+  position: absolute;
+  bottom: -20px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-accent);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 6px;
+  border-radius: 8px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+
+/* Hide the peek year when the node is focused, because the big card takes over */
+.tree-node.focused .tree-peek-year {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .tree-icon-btn.glow-effect {
   box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
   animation: idleGlow 2s infinite alternate;
+}
+
+.tree-node.focused .tree-icon-btn {
+  transform: scale(1.15);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); /* Accent color glow */
 }
 
 @keyframes idleGlow {
@@ -330,6 +371,26 @@
   width: 100%;
   text-align: center;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  
+  /* Collapsing logic */
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  border-width: 0;
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.tree-node.focused .tree-card {
+  max-height: 500px;
+  opacity: 1;
+  padding: var(--sp-5);
+  margin-top: var(--sp-4);
+  margin-bottom: var(--sp-4);
+  border-width: 1px;
 }
 
 .tree-year {
