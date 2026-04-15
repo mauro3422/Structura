@@ -271,36 +271,29 @@ function renderQuiz(section, index, lessonId) {
 }
 
 function renderTimeline(section, index) {
-  const timelineId = `timeline-${index}`;
+  const treeId = `interactive-tree-${index}`;
   
-  const slides = section.events.map((event, i) => `
-    <div class="timeline-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
-      <div class="timeline-slide__header">
-        <span class="timeline-slide__year">${event.year}</span>
-        <span class="timeline-slide__icon">${event.icon}</span>
+  const nodes = section.events.map((event, i) => `
+    <div class="tree-node ${i === 0 ? 'visible' : ''}" data-index="${i}">
+      ${i > 0 ? '<div class="tree-line"></div>' : ''}
+      <div class="tree-content">
+        <button class="tree-icon-btn glow-effect" data-target="${i + 1}">
+          <span class="tree-icon">${event.icon}</span>
+        </button>
+        <div class="tree-card">
+          <div class="tree-year">${event.year}</div>
+          <h3 class="tree-title">${event.title}</h3>
+          <p class="tree-desc">${event.description}</p>
+        </div>
       </div>
-      <h3 class="timeline-slide__title">${event.title}</h3>
-      <p class="timeline-slide__desc">${event.description}</p>
     </div>
   `).join('');
 
-  const dots = section.events.map((_, i) => `
-    <button class="timeline-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></button>
-  `).join('');
-
   return `
-    <div class="timeline-slider" id="${timelineId}" data-current="0" data-total="${section.events.length}">
-      <div class="timeline-slider__viewport">
-        <div class="timeline-slider__track" id="${timelineId}-track">
-          ${slides}
-        </div>
-      </div>
-      <div class="timeline-slider__controls">
-        <button class="btn btn-secondary timeline-btn-prev" id="${timelineId}-prev" disabled>←</button>
-        <div class="timeline-slider__dots" id="${timelineId}-dots">
-          ${dots}
-        </div>
-        <button class="btn btn-primary timeline-btn-next" id="${timelineId}-next">Siguiente →</button>
+    <div class="interactive-tree" id="${treeId}">
+      <p class="tree-hint">Toca un ícono para expandir el árbol 👇</p>
+      <div class="tree-container">
+        ${nodes}
       </div>
     </div>
   `;
