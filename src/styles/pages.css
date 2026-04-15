@@ -218,77 +218,103 @@
   color: var(--text-dimmed);
 }
 
-/* --- Timeline --- */
+/* --- Premium Animated Timeline --- */
 .timeline {
   position: relative;
-  padding-left: var(--sp-2);
+  padding-left: 45px; /* Room for the central glowing line */
+  margin: var(--sp-6) 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 20px; /* Position of the line */
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--color-primary), var(--color-secondary), transparent);
+  animation: glowLine 4s infinite alternate;
 }
 
 .timeline-event {
-  display: flex;
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
   position: relative;
+  margin-bottom: var(--sp-6);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  will-change: transform;
+}
+
+.timeline-event:hover {
+  transform: translateX(8px);
+  border-color: var(--color-primary);
 }
 
 .timeline-event__marker {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.timeline-event__icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-full);
-  background: var(--bg-surface);
-  border: 2px solid var(--border-default);
+  position: absolute;
+  left: -43px; /* Align perfectly with the line at left: 20px (20 - 45 + 50% adjustment) -> 20px minus the container padding left + marker half size */
+  /* Wait, timeline padding-left: 45px. Line is at left: 20px inside timeline. 
+     The timeline-event is relative. Its left edge is at timeline padding edge (45px).
+     To reach 20px, left must be -25px. The marker is 32px wide, so center is 16px. -25px - 16px + 1px logic -> let's make it left: -41px; */
+  left: -41px;
+  top: var(--sp-4);
+  width: 32px;
+  height: 32px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  position: relative;
-  z-index: 1;
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+  animation: pulseMarker 2s infinite alternate;
 }
 
-.timeline-event__line {
-  width: 2px;
-  flex: 1;
-  background: var(--border-subtle);
-  margin-top: var(--sp-2);
-}
-
-.timeline-event:last-child .timeline-event__line {
-  display: none;
-}
+.timeline-event__icon { display: block; }
+.timeline-event__line { display: none; }
 
 .timeline-event__content {
   flex: 1;
-  padding-bottom: var(--sp-2);
 }
 
 .timeline-event__year {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
-  padding: 1px 8px;
+  font-weight: 700;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  padding: 2px 10px;
   border-radius: var(--radius-full);
+  display: inline-block;
+  margin-bottom: var(--sp-2);
 }
 
 .timeline-event__title {
   font-size: var(--text-base);
   font-weight: 700;
   color: var(--text-primary);
-  margin: var(--sp-2) 0 var(--sp-1);
+  margin-bottom: var(--sp-1);
 }
 
 .timeline-event__desc {
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  line-height: 1.5;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+@keyframes glowLine {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; filter: drop-shadow(0 0 5px var(--color-primary)); }
+}
+
+@keyframes pulseMarker {
+  0% { transform: scale(1); box-shadow: 0 0 5px rgba(99, 102, 241, 0.2); }
+  100% { transform: scale(1.1); box-shadow: 0 0 15px rgba(99, 102, 241, 0.6); }
 }
 
 /* --- Stats Grid --- */

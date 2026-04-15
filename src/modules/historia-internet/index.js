@@ -11,27 +11,17 @@ const origenes = lesson('origenes-internet', 'Los Orígenes')
   .description('De ARPANET al Internet moderno')
   .duration('6 min')
   .text('¿Alguna vez te preguntaste cómo empezó todo esto? La historia del Internet empieza en plena <b>Guerra Fría</b>, en los años 60.')
-  .diagram(`timeline
-    title La Ruta del Internet
-    1969 : ARPANET
-         : 4 Universidades y el DoD
-    1971 : Email (Ray Tomlinson)
-         : Se inventa el @
-    1983 : TCP/IP Adoptado
-         : El "idioma" oficial nace
-    1989 : World Wide Web
-         : Tim Berners-Lee y HTML/HTTP
-    1993 : Navegador Mosaic
-         : Internet para el público
-    1998 : Google Inc.
-         : Cambia la búsqueda
-    2004 : Facebook
-         : Era de las Redes Sociales
-    2007 : iPhone
-         : Internet se vuelve móvil
-    2020+ : IA y Nube
-         : Conexión Global Total
-  `)
+  .timeline([
+    event('1969', 'ARPANET', 'El Departamento de Defensa de EE.UU. crea la primera red de computadoras. Solo conectaba 4 universidades.', '🖥️'),
+    event('1971', 'Primer Email', 'Ray Tomlinson envía el primer correo electrónico. Usó el símbolo @ para separar usuario y destino.', '📧'),
+    event('1983', 'TCP/IP', 'Se adopta el protocolo TCP/IP, el "idioma" que usan las computadoras para comunicarse. Nace el Internet como lo conocemos.', '🔌'),
+    event('1989', 'World Wide Web', 'Tim Berners-Lee inventa la WWW en el CERN. Creó HTML, HTTP y las URLs. ¡Nace la web!', '🌐'),
+    event('1993', 'Mosaic', 'Se lanza Mosaic, el primer navegador web popular. Internet empieza a llegar a la gente común.', '🖱️'),
+    event('1998', 'Google', 'Larry Page y Sergey Brin crean Google en un garage. Cambia la forma de buscar información.', '🔍'),
+    event('2004', 'Facebook', 'Mark Zuckerberg lanza Facebook desde Harvard. Comienza la era de las redes sociales.', '👥'),
+    event('2007', 'iPhone', 'Apple lanza el primer iPhone. Internet empieza a ser principalmente móvil.', '📱'),
+    event('2020+', 'IA y Cloud', 'Inteligencia Artificial, computación en la nube y 5G. Estamos en la era más conectada de la historia.', '🤖'),
+  ])
   .quiz('¿Cuál fue el antecesor directo del Internet?', [
     'Facebook', 'Google', 'ARPANET', 'Windows',
   ], 2, 'ARPANET (1969) fue la primera red de computadoras y el antepasado directo del Internet moderno.')
