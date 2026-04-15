@@ -12,6 +12,22 @@ import { renderModules, renderModuleDetail } from './pages/modules.js';
 import { renderLesson } from './pages/lesson.js';
 import { renderGlossary } from './pages/glossary.js';
 import { Progress } from './core/Progress.js';
+import mermaid from 'mermaid';
+
+// Initialize Mermaid with custom brand colors
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  themeVariables: {
+    primaryColor: 'rgba(255, 255, 255, 0.05)',
+    primaryTextColor: '#fff',
+    primaryBorderColor: '#6366f1',
+    lineColor: '#6366f1',
+    secondaryColor: '#ec4899',
+    tertiaryColor: '#1e1e2e',
+    fontFamily: '"Geist", "Inter", sans-serif',
+  }
+});
 
 // Global hook for progress marking via inline HTML onclicks
 window.markCompleted = function(lessonId) {
@@ -56,6 +72,13 @@ function initApp() {
 
 // --- Interactive Elements Setup ---
 function setupInteractivity() {
+  // Render diagrams
+  try {
+    mermaid.run({ querySelector: '.mermaid' });
+  } catch (e) {
+    console.warn('Mermaid rendering skipped or failed:', e);
+  }
+
   setupQuizzes();
   setupAddRowButtons();
   setupAddColumnButtons();

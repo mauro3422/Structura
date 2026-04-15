@@ -165,6 +165,12 @@ export class LessonBuilder {
     return this;
   }
 
+  /** Add a dynamic diagram */
+  diagram(code, format = 'mermaid') {
+    this._sections.push({ type: 'diagram', format, code });
+    return this;
+  }
+
   /** Add a quiz question */
   quiz(question, options, correctIndex, explanation) {
     this._sections.push({ type: 'quiz', question, options, correctIndex, explanation });

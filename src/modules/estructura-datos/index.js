@@ -123,6 +123,18 @@ const clavesRelaciones = lesson('claves-relaciones', 'Claves y Relaciones')
   ])
   .info('¿Ves el <b>alumno_id</b>? Los valores 1 y 2 hacen referencia a los IDs de la tabla Alumnos. Así se conectan las tablas.', { variant: 'secondary', icon: '🔗' })
   .heading('Tipos de Relaciones')
+  .diagram(`erDiagram
+    ALUMNOS ||--o{ INSCRIPCIONES : realiza
+    ALUMNOS {
+        int ID PK
+        string Nombre
+    }
+    INSCRIPCIONES {
+        int ID PK
+        int alumno_id FK
+        string Materia
+    }
+  `)
   .conceptCards([
     concept('1️⃣', 'Uno a Uno (1:1)', 'Cada registro de A se relaciona con exactamente UNO de B. Ej: Persona ↔ DNI.', 'primary'),
     concept('📑', 'Uno a Muchos (1:N)', 'Un registro de A se relaciona con MUCHOS de B. Ej: Un alumno → muchas inscripciones.', 'secondary'),

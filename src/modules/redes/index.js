@@ -19,6 +19,13 @@ export default new Module({
         concept('🔗', 'Enlaces', 'Los cables de fibra óptica o señales WiFi que los unen.'),
         concept('🗣️', 'Protocolos', 'El "idioma" que usan para entenderse (ej: HTTP o TCP/IP).', 'secondary')
       ])
+      .heading('Topología de Red Estrellada')
+      .diagram(`graph TD
+          R((📡 Router))
+          R ---|WiFi| L[💻 Laptop]
+          R ---|WiFi| C[📱 Celular]
+          R ---|Cable| S[(🗄️ Servidor Local)]
+      `)
       .info('Si no existieran las redes, tendrías que pasarme este sistema usando un pendrive en persona. ¡El Internet es solo la red más grande que existe!', { variant: 'accent', icon: '✨' })
       .build(),
 
@@ -58,6 +65,16 @@ export default new Module({
         { title: 'Tú escribes', content: 'www.google.com' },
         { title: 'El DNS traduce a', content: '142.250.78.46' }
       )
+      .diagram(`sequenceDiagram
+        participant U as 📱 Tu Celular
+        participant D as 🌐 Servidor DNS
+        participant S as 🗄️ Google (142.250...)
+        
+        U->>D: 1. ¿Cuál es la IP de google.com?
+        D-->>U: 2. Es 142.250.78.46!
+        U->>S: 3. Hola 142..., dame la página
+        S-->>U: 4. Acá tenés la página web
+      `)
       .info('El DNS funciona exactamente igual que la libreta de contactos de tu celular. Vos buscás "Mamá" y el celular marca el número.', { variant: 'secondary' })
       .build()
   ],

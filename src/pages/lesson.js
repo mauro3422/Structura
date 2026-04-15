@@ -88,6 +88,9 @@ function renderSection(section, index, lessonId) {
     case 'search-animation':
       return renderSearchAnimation(section, index, lessonId);
 
+    case 'diagram':
+      return renderDiagram(section, index);
+
     default:
       return '';
   }
@@ -231,6 +234,14 @@ function renderCodeBlock(section, index) {
         ${section.language}
       </div>
       <pre style="margin:0;white-space:pre-wrap;word-break:break-word"><code>${code}</code></pre>
+    </div>
+  `;
+}
+
+function renderDiagram(section, index) {
+  return `
+    <div class="diagram-wrapper" style="animation: slideUp 0.4s both ${index * 0.05}s; margin: var(--sp-4) 0">
+      <pre class="mermaid">${section.code}</pre>
     </div>
   `;
 }
