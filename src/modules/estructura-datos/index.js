@@ -71,7 +71,7 @@ const tablaInteractiva = lesson('tabla-interactiva', 'Tabla Interactiva')
   ], [
     [1, 'Coca Cola', 1500, 50],
     [2, 'Pan', 800, 30],
-  ], { canAddColumns: false })
+  ], { canAddColumns: true })
   .heading('¿Para qué sirve cada parte?')
   .text('En tu tabla podés ver cómo funciona todo junto:')
   .conceptCards([
