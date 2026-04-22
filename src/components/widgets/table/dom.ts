@@ -167,6 +167,7 @@ function collectObservations(labId: string): TableObservation[] {
     const columns = Array.from(wrapper.querySelectorAll<HTMLTableCellElement>('thead th[data-col-index]'));
     const seenColumns = new Set<string>();
     let hasPk = false;
+    let pkCount = 0;
 
     columns.forEach((th) => {
       const colName = th.querySelector<HTMLElement>('.col-name-editable')?.textContent?.trim() || '';
@@ -176,7 +177,10 @@ function collectObservations(labId: string): TableObservation[] {
       const cardinality = normalizeCardinality(th.querySelector<HTMLElement>('.cardinality-toggle')?.textContent?.trim());
       const sourceIsPk = isPk;
 
-      if (isPk) hasPk = true;
+      if (isPk) {
+        hasPk = true;
+        pkCount += 1;
+      }
 
       if (colName) {
         if (seenColumns.has(colName)) {
@@ -225,6 +229,18 @@ function collectObservations(labId: string): TableObservation[] {
         markColumnObserved(th, 'warning');
       }
     });
+
+    if (pkCount > 1) {
+      observations.push({
+        kind: 'info',
+        title: 'Clave primaria compuesta',
+        message: `La tabla "${tableName || 'sin nombre'}" usa ${pkCount} columnas como PK.`,
+        hint: 'Eso puede ser valido si la identidad real depende de mas de una columna.',
+        subject: tableName || undefined,
+      });
+      markTableObserved(item, 'info');
+      markTableNameObserved(item, 'info');
+    }
 
       if (!hasPk) {
       observations.push({

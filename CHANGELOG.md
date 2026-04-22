@@ -7,7 +7,8 @@ y el proyecto se adhiere a versionado semántico.
 
 ## Entradas Rápidas
 
-* [v1.2.10 - Reglas del laboratorio para tablas](./changelogs/v1.2.10.md) *(actual)*
+* [v1.2.11 - Clave compuesta y reglas mas claras](./changelogs/v1.2.11.md) *(actual)*
+* [v1.2.10 - Reglas del laboratorio para tablas](./changelogs/v1.2.10.md)
 * [v1.2.9 - Ids estables y cardinalidad mas limpia](./changelogs/v1.2.9.md)
 * [v1.2.8 - Observaciones por tabla y columna con nombres flexibles](./changelogs/v1.2.8.md)
 * [v1.2.7 - Observaciones didacticas de tablas](./changelogs/v1.2.7.md)

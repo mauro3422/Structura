@@ -42,4 +42,36 @@ describe('Table observations panel', () => {
     expect(columnHeaders[0]?.className).not.toContain('lab-column-observed--info');
     expect(columnHeaders[1]?.className).toContain('lab-column-observed--error');
   });
+
+  it('recognizes multiple primary keys as a composite key hint', () => {
+    document.body.innerHTML = '<main id="main-content"></main>';
+    const main = document.getElementById('main-content') as HTMLElement;
+
+    main.innerHTML = renderTableLaboratory(
+      {
+        type: 'table-laboratory',
+        initialTables: [
+          {
+            tableName: 'inventario_compuesto',
+            columns: [
+              { name: 'producto_id', type: 'INT', isPK: true },
+              { name: 'almacen_id', type: 'INT', isPK: true },
+              { name: 'stock', type: 'INT' },
+            ],
+            rows: [[1, 2, 40]],
+          },
+        ],
+      },
+      0,
+      'demo-composite',
+    );
+
+    updateObservations('table-lab-demo-composite');
+
+    const panel = main.querySelector('.lab-observations-panel');
+    expect(panel?.textContent).toContain('Clave primaria compuesta');
+
+    const tableItem = main.querySelector('.lab-table-item');
+    expect(tableItem?.className).toContain('lab-table-item--observed-info');
+  });
 });

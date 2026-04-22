@@ -39,6 +39,7 @@ function renderLaboratoryRulesPanel(labId: string): string {
           <ul class="lab-rule-card__list">
             <li>snake_case o camelCase son válidos.</li>
             <li>El sistema solo sugiere ordenar nombres inconsistentes.</li>
+            <li>Si marcas varias PK, el laboratorio lo interpreta como clave compuesta.</li>
             <li>1:N puede repetirse en detalle sin problema.</li>
           </ul>
         </article>
