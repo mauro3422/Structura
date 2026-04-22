@@ -36,6 +36,53 @@
   gap: var(--sp-6);
 }
 
+.lab-table-item--observed-info {
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35), 0 0 0 3px rgba(59, 130, 246, 0.08);
+}
+
+.lab-table-item--observed-warning {
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.35), 0 0 0 3px rgba(245, 158, 11, 0.08);
+}
+
+.lab-table-item--observed-error {
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4), 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.lab-table-name-observed {
+  box-shadow: 0 0 0 1px transparent;
+}
+
+.lab-table-name-observed--info {
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35), 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.lab-table-name-observed--warning {
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.4), 0 0 0 3px rgba(245, 158, 11, 0.12);
+}
+
+.lab-table-name-observed--error {
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.45), 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.lab-column-observed {
+  position: relative;
+}
+
+.lab-column-observed--info {
+  outline: 2px solid rgba(59, 130, 246, 0.45);
+  outline-offset: -2px;
+}
+
+.lab-column-observed--warning {
+  outline: 2px solid rgba(245, 158, 11, 0.55);
+  outline-offset: -2px;
+}
+
+.lab-column-observed--error {
+  outline: 2px solid rgba(239, 68, 68, 0.65);
+  outline-offset: -2px;
+}
+
 .lab-observations-panel {
   display: flex;
   flex-direction: column;

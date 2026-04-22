@@ -96,7 +96,7 @@ export function renderLabTable(
     .map(
       (col, ci) => `
     <th class="data-table__header-cell" data-pk="${col.isPK || false}" data-fk="${col.isFK || false}" data-col-index="${ci}">
-      <div contenteditable="true" class="col-name-editable">${escapeHtml(col.name)}</div>
+      <div contenteditable="true" class="col-name-editable" autocapitalize="off" autocorrect="off" spellcheck="false">${escapeHtml(col.name)}</div>
       <span class="col-type">${escapeHtml(col.type)}${col.autoIncrement ? ' AUTO' : ''}</span>
       <div class="col-metadata-toggles">
         <button class="meta-toggle ${col.isPK ? 'active' : ''}" data-action="toggle-pk" title="Clave primaria">🔑</button>
@@ -151,7 +151,7 @@ export function renderLabTable(
   return renderSectionBlock(
     `
     <div class="lab-table-header">
-      <span class="table-name-display" contenteditable="true">${escapeHtml(table.tableName)}</span>
+      <span class="table-name-display" contenteditable="true" autocapitalize="off" autocorrect="off" spellcheck="false">${escapeHtml(table.tableName)}</span>
       <span class="edit-icon">✎</span>
       <button class="lab-table-delete" title="Eliminar tabla">×</button>
     </div>

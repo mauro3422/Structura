@@ -62,12 +62,55 @@ function describeRoles(cardinality: string): { sourceRole: string; targetRole: s
   return { sourceRole: 'Detalle', targetRole: 'Maestra' };
 }
 
+function clearObservationMarks(labId: string): void {
+  const lab = document.getElementById(labId);
+  if (!lab) return;
+
+  lab.querySelectorAll<HTMLElement>('.lab-table-item').forEach((item) => {
+    item.classList.remove('lab-table-item--observed-info', 'lab-table-item--observed-warning', 'lab-table-item--observed-error');
+  });
+
+  lab.querySelectorAll<HTMLElement>('.table-name-display').forEach((name) => {
+    name.classList.remove('lab-table-name-observed', 'lab-table-name-observed--info', 'lab-table-name-observed--warning', 'lab-table-name-observed--error');
+  });
+
+  lab.querySelectorAll<HTMLElement>('.data-table__header-cell').forEach((th) => {
+    th.classList.remove('lab-column-observed', 'lab-column-observed--info', 'lab-column-observed--warning', 'lab-column-observed--error');
+  });
+}
+
+function markTableObserved(item: HTMLElement, kind: TableObservation['kind']): void {
+  item.classList.add(`lab-table-item--observed-${kind}`);
+}
+
+function markTableNameObserved(item: HTMLElement, kind: TableObservation['kind']): void {
+  const name = item.querySelector<HTMLElement>('.table-name-display');
+  if (!name) return;
+  name.classList.add('lab-table-name-observed', `lab-table-name-observed--${kind}`);
+}
+
+function markColumnObserved(th: HTMLElement, kind: TableObservation['kind']): void {
+  th.classList.add('lab-column-observed', `lab-column-observed--${kind}`);
+}
+
 function isAcronym(value: string): boolean {
   return /^[A-Z0-9]{2,}$/.test(value);
 }
 
 function isCamelCaseLike(value: string): boolean {
   return /^[a-z][A-Za-z0-9]*$/.test(value);
+}
+
+function isSnakeCaseLike(value: string): boolean {
+  return /^[a-z][a-z0-9_]*$/.test(value);
+}
+
+function shouldSuggestCamelCase(value: string): boolean {
+  if (!value || isAcronym(value) || isCamelCaseLike(value) || isSnakeCaseLike(value)) {
+    return false;
+  }
+
+  return /[\s-]/.test(value) || /[A-Z]/.test(value) || /[^A-Za-z0-9_]/.test(value);
 }
 
 function toCamelCase(value: string): string {
@@ -92,9 +135,12 @@ function collectObservations(labId: string): TableObservation[] {
   const canvas = document.getElementById(`${labId}-canvas`);
   if (!canvas) return [];
 
+  clearObservationMarks(labId);
+
   const tables = Array.from(canvas.querySelectorAll<HTMLElement>('.lab-table-item'));
   const observations: TableObservation[] = [];
   const tableNames = new Map<string, number>();
+  const tableItemsByName = new Map<string, HTMLElement[]>();
 
   tables.forEach((item) => {
     const tableName = item.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || '';
@@ -104,18 +150,15 @@ function collectObservations(labId: string): TableObservation[] {
         title: 'Nombre de tabla vacío',
         message: 'Cada tabla debería tener un nombre visible.',
         hint: 'Poné un nombre corto y claro, por ejemplo clientes o pedidos.',
+        subject: 'Tabla sin nombre',
       });
+      markTableObserved(item, 'error');
+      markTableNameObserved(item, 'error');
     } else {
       tableNames.set(tableName, (tableNames.get(tableName) || 0) + 1);
-      if (tableName.includes('_') || tableName.includes(' ')) {
-        observations.push({
-          kind: 'info',
-          title: 'Sugerencia de nombre de tabla',
-          message: `La tabla "${tableName}" funciona, pero podrías escribirla con camelCase para mantener el estilo.`,
-          hint: `Sugerencia: ${toCamelCase(tableName)}`,
-          subject: tableName,
-        });
-      }
+      const list = tableItemsByName.get(tableName) || [];
+      list.push(item);
+      tableItemsByName.set(tableName, list);
     }
 
     const wrapper = item.querySelector<HTMLElement>('.data-table-wrapper');
@@ -144,17 +187,19 @@ function collectObservations(labId: string): TableObservation[] {
             hint: 'Usá un nombre único para cada campo.',
             subject: colName,
           });
+          markColumnObserved(th, 'error');
         }
         seenColumns.add(colName);
 
-        if (!isAcronym(colName) && !isCamelCaseLike(colName)) {
+        if (shouldSuggestCamelCase(colName)) {
           observations.push({
             kind: 'info',
-            title: 'Sugerencia camelCase',
-            message: `La columna "${colName}" se entiende, pero camelCase suele ser más consistente para variables.`,
+            title: 'Sugerencia de nombre',
+            message: `La columna "${colName}" se entiende, pero un formato uniforme facilita leer el modelo.`,
             hint: `Sugerencia: ${toCamelCase(colName)}`,
             subject: colName,
           });
+          markColumnObserved(th, 'info');
         }
       }
 
@@ -166,6 +211,7 @@ function collectObservations(labId: string): TableObservation[] {
           hint: 'Elegí una tabla destino para cerrar el enlace.',
           subject: colName || undefined,
         });
+        markColumnObserved(th, 'error');
       }
 
       if (isFk && targetTable && cardinality === '1:1' && !sourceIsPk) {
@@ -176,10 +222,11 @@ function collectObservations(labId: string): TableObservation[] {
           hint: 'Si querés 1:1 estricta, la FK debería ser única o compartir la PK.',
           subject: colName || undefined,
         });
+        markColumnObserved(th, 'warning');
       }
     });
 
-    if (!hasPk) {
+      if (!hasPk) {
       observations.push({
         kind: 'warning',
         title: 'Falta clave primaria',
@@ -187,6 +234,8 @@ function collectObservations(labId: string): TableObservation[] {
         hint: 'Una tabla base normalmente debería tener una clave primaria.',
         subject: tableName || undefined,
       });
+      markTableObserved(item, 'warning');
+      markTableNameObserved(item, 'warning');
     }
   });
 
@@ -198,6 +247,10 @@ function collectObservations(labId: string): TableObservation[] {
         message: `Hay ${count} tablas con el nombre "${name}".`,
         hint: 'Cada tabla debería tener un nombre distinto para evitar confusiones.',
         subject: name,
+      });
+      tableItemsByName.get(name)?.forEach((item) => {
+        markTableObserved(item, 'error');
+        markTableNameObserved(item, 'error');
       });
     }
   });
