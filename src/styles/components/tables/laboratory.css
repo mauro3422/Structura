@@ -67,7 +67,7 @@
 
 .lab-rules-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--sp-3);
   align-items: stretch;
 }
@@ -127,7 +127,7 @@
   color: var(--text-secondary);
   font-size: 0.68rem;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.35rem;
   align-self: start;
 }
