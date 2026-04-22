@@ -17,6 +17,15 @@ export interface TableDefinition {
   rows: TableCellValue[][];
 }
 
+export interface TableRelationship {
+  sourceTable: string;
+  sourceColumn: string;
+  targetTable: string;
+  cardinality: string;
+  status: 'linked' | 'missing-target' | 'missing-reference';
+  message: string;
+}
+
 export interface TableSection {
   tableName?: string;
   columns?: TableColumn[];

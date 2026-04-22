@@ -75,6 +75,7 @@ export function renderTableLaboratory(section: TableSection, index: number, less
           ${tablesHtml}
         </div>
       </div>
+      <div class="lab-relations-panel" id="${labId}-relations" aria-live="polite"></div>
       <div id="${labId}-status" class="lab-status"></div>
     </div>
   `;

@@ -1,0 +1,45 @@
+import { describe, expect, it } from 'vitest';
+import { renderTableLaboratory } from '../src/components/widgets/table/renderers.ts';
+import { updateRelationships } from '../src/components/widgets/table/dom.ts';
+
+describe('Table relationship panel', () => {
+  it('lists linked relationships and cardinality', () => {
+    document.body.innerHTML = '<main id="main-content"></main>';
+    const main = document.getElementById('main-content') as HTMLElement;
+
+    main.innerHTML = renderTableLaboratory(
+      {
+        type: 'table-laboratory',
+        initialTables: [
+          {
+            tableName: 'Clientes',
+            columns: [
+              { name: 'ID', type: 'INT', isPK: true },
+              { name: 'Nombre', type: 'TEXT' },
+            ],
+            rows: [[1, 'Ana']],
+          },
+          {
+            tableName: 'Pedidos',
+            columns: [
+              { name: 'ID', type: 'INT', isPK: true },
+              { name: 'cliente_id', type: 'INT', isFK: true, references: 'Clientes', cardinality: '1:N' },
+              { name: 'Total', type: 'FLOAT' },
+            ],
+            rows: [[1, 1, 1500]],
+          },
+        ],
+      },
+      0,
+      'demo',
+    );
+
+    updateRelationships('table-lab-demo');
+
+    const panel = main.querySelector('.lab-relations-panel');
+    expect(panel?.textContent).toContain('Panel de relaciones');
+    expect(panel?.textContent).toContain('Pedidos.cliente_id → Clientes');
+    expect(panel?.textContent).toContain('1:N');
+    expect(panel?.textContent).toContain('Relación uno a muchos detectada.');
+  });
+});

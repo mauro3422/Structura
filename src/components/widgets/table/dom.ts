@@ -1,4 +1,5 @@
-import type { RenderLabTable, TableDefinition } from './types.ts';
+import { escapeHtml } from '../Utils.ts';
+import type { RenderLabTable, TableDefinition, TableRelationship } from './types.ts';
 
 export function getLabState(labId: string): TableDefinition[] {
   const lab = document.getElementById(labId);
@@ -46,12 +47,132 @@ export function renderCanvas(labId: string, tables: TableDefinition[], renderLab
   updateRelationships(labId);
 }
 
+function normalizeCardinality(value: string | undefined): string {
+  const normalized = (value || '1:N').replace(/\s+/g, '').toUpperCase();
+  if (normalized === '1:1') return '1:1';
+  if (normalized === '1:N') return '1:N';
+  return '1:N';
+}
+
+function collectRelationships(labId: string): TableRelationship[] {
+  const canvas = document.getElementById(`${labId}-canvas`);
+  if (!canvas) return [];
+
+  const tables = Array.from(canvas.querySelectorAll<HTMLElement>('.lab-table-item'));
+  const names = new Set(
+    tables
+      .map((item) => item.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || '')
+      .filter(Boolean),
+  );
+
+  const relationships: TableRelationship[] = [];
+
+  tables.forEach((item) => {
+    const sourceTable = item.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || '';
+    const wrapper = item.querySelector<HTMLElement>('.data-table-wrapper');
+    if (!wrapper) return;
+
+    Array.from(wrapper.querySelectorAll<HTMLTableCellElement>('thead th[data-col-index]')).forEach((th) => {
+      if (th.dataset.fk !== 'true') return;
+
+      const sourceColumn = th.querySelector<HTMLElement>('.col-name-editable')?.textContent?.trim() || 'Columna';
+      const targetTable = th.querySelector<HTMLSelectElement>('.ref-picker')?.value?.trim() || '';
+      const cardinality = normalizeCardinality(th.querySelector<HTMLElement>('.cardinality-toggle')?.textContent?.trim());
+
+      if (!targetTable) {
+        relationships.push({
+          sourceTable,
+          sourceColumn,
+          targetTable: 'Sin destino',
+          cardinality,
+          status: 'missing-reference',
+          message: 'Elegí una tabla destino para cerrar la relación.',
+        });
+        return;
+      }
+
+      relationships.push({
+        sourceTable,
+        sourceColumn,
+        targetTable,
+        cardinality,
+        status: names.has(targetTable) ? 'linked' : 'missing-target',
+        message: names.has(targetTable)
+          ? cardinality === '1:1'
+            ? 'Relación uno a uno detectada.'
+            : 'Relación uno a muchos detectada.'
+          : 'La tabla destino no está disponible en el laboratorio.',
+      });
+    });
+  });
+
+  return relationships;
+}
+
+function renderRelationshipItem(item: TableRelationship): string {
+  const stateLabel =
+    item.status === 'linked'
+      ? 'OK'
+      : item.status === 'missing-target'
+        ? 'Destino ausente'
+        : 'Falta destino';
+
+  return `
+    <div class="lab-relation-item lab-relation-item--${item.status}">
+      <div class="lab-relation-item__top">
+        <span class="lab-relation-item__pair">${escapeHtml(item.sourceTable)}.${escapeHtml(item.sourceColumn)} → ${escapeHtml(item.targetTable)}</span>
+        <span class="lab-relation-item__badge">${escapeHtml(item.cardinality)}</span>
+      </div>
+      <div class="lab-relation-item__bottom">
+        <span class="lab-relation-item__state">${escapeHtml(stateLabel)}</span>
+        <span class="lab-relation-item__message">${escapeHtml(item.message)}</span>
+      </div>
+    </div>
+  `;
+}
+
+export function renderRelationshipsPanel(labId: string, relationships: TableRelationship[]): void {
+  const panel = document.getElementById(`${labId}-relations`);
+  if (!panel) return;
+
+  const linkedCount = relationships.filter((item) => item.status === 'linked').length;
+  const missingCount = relationships.length - linkedCount;
+
+  panel.innerHTML = `
+    <div class="lab-relations-panel__header">
+      <div>
+        <div class="lab-relations-panel__title">Panel de relaciones</div>
+        <div class="lab-relations-panel__subtitle">Detecta FKs, destinos y cardinalidad</div>
+      </div>
+      <div class="lab-relations-panel__stats">
+        <span class="lab-relations-panel__chip">${relationships.length} total</span>
+        <span class="lab-relations-panel__chip ${missingCount > 0 ? 'is-warning' : 'is-ok'}">${linkedCount} vinculadas</span>
+      </div>
+    </div>
+    ${
+      relationships.length > 0
+        ? `
+          <div class="lab-relations-list">
+            ${relationships.map((item) => renderRelationshipItem(item)).join('')}
+          </div>
+        `
+        : `
+          <div class="lab-relations-empty">
+            No hay relaciones definidas todavía. Marcá una columna como FK y elegí su tabla destino para empezar.
+          </div>
+        `
+    }
+  `;
+}
+
 export function updateRelationships(labId: string): void {
   const svg = document.getElementById(`${labId}-svg`) as SVGSVGElement | null;
   const canvas = document.getElementById(`${labId}-canvas`) as HTMLElement | null;
-  if (!svg || !canvas) return;
+  if (!canvas) return;
 
-  svg.innerHTML = '';
+  if (svg) {
+    svg.innerHTML = '';
+  }
   const canvasRect = canvas.getBoundingClientRect();
   const tables = Array.from(canvas.querySelectorAll<HTMLElement>('.lab-table-item'));
 
@@ -82,7 +203,7 @@ export function updateRelationships(labId: string): void {
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             path.setAttribute('d', `M ${x1} ${y1} C ${x1 + 40} ${y1}, ${x2 - 40} ${y2}, ${x2} ${y2}`);
             path.setAttribute('class', 'rel-line');
-            svg.appendChild(path);
+            svg?.appendChild(path);
 
             const card = th.querySelector<HTMLElement>('.cardinality-toggle')?.textContent?.trim() || '1:N';
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -91,10 +212,12 @@ export function updateRelationships(labId: string): void {
             label.setAttribute('class', 'rel-label');
             label.setAttribute('text-anchor', 'middle');
             label.textContent = card;
-            svg.appendChild(label);
+            svg?.appendChild(label);
           }
         }
       }
     });
   });
+
+  renderRelationshipsPanel(labId, collectRelationships(labId));
 }
