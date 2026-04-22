@@ -525,10 +525,25 @@ function renderRelationshipItem(item: TableRelationship): string {
   `;
 }
 
+function renderRelationshipGroup(title: string, items: TableRelationship[]): string {
+  if (items.length === 0) return '';
+
+  return `
+    <section class="lab-relations-group">
+      <div class="lab-relations-group__title">${escapeHtml(title)}</div>
+      <div class="lab-relations-list">
+        ${items.map((item) => renderRelationshipItem(item)).join('')}
+      </div>
+    </section>
+  `;
+}
+
 export function renderRelationshipsPanel(labId: string, relationships: TableRelationship[]): void {
   const panel = document.getElementById(`${labId}-relations`); 
   if (!panel) return;
 
+  const directRelationships = relationships.filter((item) => item.relationshipKind === 'direct');
+  const derivedRelationships = relationships.filter((item) => item.relationshipKind === 'derived');
   const linkedCount = relationships.filter((item) => item.status === 'linked' || item.status === 'derived').length;
   const derivedCount = relationships.filter((item) => item.status === 'derived').length;
   const cautionCount = relationships.filter((item) => item.status === 'caution').length;
@@ -542,6 +557,7 @@ export function renderRelationshipsPanel(labId: string, relationships: TableRela
       </div>
       <div class="lab-relations-panel__stats">
         <span class="lab-relations-panel__chip">${relationships.length} total</span>
+        <span class="lab-relations-panel__chip is-ok">${directRelationships.length} directas</span>
         <span class="lab-relations-panel__chip ${missingCount > 0 || cautionCount > 0 ? 'is-warning' : 'is-ok'}">${linkedCount} vinculadas</span>
         ${derivedCount > 0 ? `<span class="lab-relations-panel__chip is-derived">${derivedCount} N:N</span>` : ''}
         ${cautionCount > 0 ? `<span class="lab-relations-panel__chip is-warning">${cautionCount} a revisar</span>` : ''}
@@ -550,9 +566,8 @@ export function renderRelationshipsPanel(labId: string, relationships: TableRela
     ${
       relationships.length > 0
         ? `
-          <div class="lab-relations-list">
-            ${relationships.map((item) => renderRelationshipItem(item)).join('')}
-          </div>
+          ${renderRelationshipGroup('Relaciones directas', directRelationships)}
+          ${renderRelationshipGroup('Relaciones derivadas', derivedRelationships)}
         `
         : `
           <div class="lab-relations-empty">
