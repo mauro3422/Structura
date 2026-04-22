@@ -69,6 +69,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sp-3);
+  align-items: stretch;
 }
 
 .lab-rule-card {
@@ -103,15 +104,26 @@
   font-size: var(--text-sm);
   font-weight: 800;
   color: var(--text-primary);
+  line-height: 1.25;
 }
 
 .lab-rule-card__list {
   margin: var(--sp-2) 0 0;
-  padding-left: 1.1rem;
+  padding: 0;
+  list-style: none;
   color: var(--text-secondary);
   font-size: var(--text-xs);
-  display: grid;
-  gap: 0.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.lab-rule-card__list li {
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  background: rgba(59, 130, 246, 0.08);
+  line-height: 1.2;
 }
 
 .lab-table-item--observed-info {

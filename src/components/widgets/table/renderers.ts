@@ -26,31 +26,31 @@ function renderLaboratoryRulesPanel(labId: string): string {
       <div class="lab-rules-grid">
         <article class="lab-rule-card lab-rule-card--required">
           <div class="lab-rule-card__label">Obligatorio</div>
-          <div class="lab-rule-card__title">La verdad del modelo vive en la FK y su destino</div>
+          <div class="lab-rule-card__title">FK real y PK visible</div>
           <ul class="lab-rule-card__list">
-            <li>La FK debe apuntar a una tabla real.</li>
-            <li>Cada tabla necesita una PK visible.</li>
-            <li>Los nombres de tabla no deberían repetirse.</li>
+            <li>FK → tabla real</li>
+            <li>PK visible por tabla</li>
+            <li>Nombre único</li>
           </ul>
         </article>
         <article class="lab-rule-card lab-rule-card--suggested">
           <div class="lab-rule-card__label">Sugerido</div>
-          <div class="lab-rule-card__title">Usar nombres claros sin bloquear minúsculas</div>
+          <div class="lab-rule-card__title">Nombres claros, sin bloquear minúsculas</div>
           <ul class="lab-rule-card__list">
-            <li>snake_case o camelCase son válidos.</li>
-            <li>El sistema solo sugiere ordenar nombres inconsistentes.</li>
-            <li>Si marcas varias PK, el laboratorio lo interpreta como clave compuesta.</li>
-            <li>1:N puede repetirse en detalle sin problema.</li>
-            <li>El laboratorio detecta N:N cuando encuentra una tabla puente con dos FKs a distintas tablas.</li>
+            <li>snake_case o camelCase</li>
+            <li>Nombres consistentes</li>
+            <li>Varias PK = compuesta</li>
+            <li>1:N repite detalle</li>
+            <li>N:N via tabla puente</li>
           </ul>
         </article>
         <article class="lab-rule-card lab-rule-card--future">
           <div class="lab-rule-card__label">Fase 2</div>
-          <div class="lab-rule-card__title">Reglas más estrictas para modelado avanzado</div>
+          <div class="lab-rule-card__title">Reglas más estrictas</div>
           <ul class="lab-rule-card__list">
-            <li>PK compuestas más estrictas.</li>
-            <li>FK únicas reales para 1:1 estricta.</li>
-            <li>Validaciones más duras para tablas puente con atributos extra.</li>
+            <li>PK compuestas reales</li>
+            <li>FK única para 1:1</li>
+            <li>Puentes con atributos</li>
           </ul>
         </article>
       </div>

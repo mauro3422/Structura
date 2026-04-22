@@ -7,7 +7,8 @@ y el proyecto se adhiere a versionado semántico.
 
 ## Entradas Rápidas
 
-* [v1.2.13 - Relaciones directas y derivadas separadas en el panel](./changelogs/v1.2.13.md) *(actual)*
+* [v1.2.14 - Panel de reglas compactado en columnas](./changelogs/v1.2.14.md) *(actual)*
+* [v1.2.13 - Relaciones directas y derivadas separadas en el panel](./changelogs/v1.2.13.md)
 * [v1.2.12 - N:N con tabla puente e inferencia de relaciones](./changelogs/v1.2.12.md)
 * [v1.2.11 - Clave compuesta y reglas mas claras](./changelogs/v1.2.11.md)
 * [v1.2.10 - Reglas del laboratorio para tablas](./changelogs/v1.2.10.md)
