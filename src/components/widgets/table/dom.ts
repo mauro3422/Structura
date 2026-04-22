@@ -56,10 +56,10 @@ function normalizeCardinality(value: string | undefined): string {
 
 function describeRoles(cardinality: string): { sourceRole: string; targetRole: string } {
   if (cardinality === '1:1') {
-    return { sourceRole: 'lado FK', targetRole: 'referencia sugerida' };
+    return { sourceRole: 'FK', targetRole: 'Referencia sugerida' };
   }
 
-  return { sourceRole: 'detalle', targetRole: 'maestra' };
+  return { sourceRole: 'Detalle', targetRole: 'Maestra' };
 }
 
 function collectRelationships(labId: string): TableRelationship[] {
@@ -95,10 +95,10 @@ function collectRelationships(labId: string): TableRelationship[] {
           sourceColumn,
           targetTable: 'Sin destino',
           cardinality,
-          sourceRole: 'origen',
-          targetRole: 'pendiente',
+          sourceRole: 'Origen',
+          targetRole: 'Pendiente',
           status: 'missing-reference',
-          message: 'Elegir una tabla destino para cerrar la relacion.',
+          message: 'Relacion invalida: falta una tabla destino para cerrar el enlace.',
         });
         return;
       }
@@ -119,8 +119,8 @@ function collectRelationships(labId: string): TableRelationship[] {
             ? caution
               ? '1:1 detectada. Para que sea estricta, conviene que la FK sea unica o compartida con la PK.'
               : '1:1 detectada. La tabla destino funciona como referencia principal.'
-            : '1:N detectada. La tabla destino actua como maestra y la actual como detalle.'
-          : 'La tabla destino no esta disponible en el laboratorio.',
+            : '1:N detectada. La tabla destino actua como maestra y la actual como detalle. Repetir la misma FK en varias filas es normal.'
+          : 'Relacion invalida: la tabla destino no esta disponible en el laboratorio.',
       });
     });
   });

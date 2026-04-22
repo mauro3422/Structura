@@ -78,7 +78,37 @@ describe('Table relationship panel', () => {
 
     const panel = main.querySelector('.lab-relations-panel');
     expect(panel?.textContent).toContain('Revisar');
-    expect(panel?.textContent).toContain('referencia sugerida');
+    expect(panel?.textContent).toContain('Referencia sugerida');
     expect(panel?.textContent).toContain('conviene que la FK sea unica o compartida con la PK.');
+  });
+
+  it('flags missing destinations as invalid relationships', () => {
+    document.body.innerHTML = '<main id="main-content"></main>';
+    const main = document.getElementById('main-content') as HTMLElement;
+
+    main.innerHTML = renderTableLaboratory(
+      {
+        type: 'table-laboratory',
+        initialTables: [
+          {
+            tableName: 'Pedidos',
+            columns: [
+              { name: 'ID', type: 'INT', isPK: true },
+              { name: 'cliente_id', type: 'INT', isFK: true, cardinality: '1:N' },
+              { name: 'Total', type: 'FLOAT' },
+            ],
+            rows: [[1, 99, 1500]],
+          },
+        ],
+      },
+      0,
+      'demo-missing',
+    );
+
+    updateRelationships('table-lab-demo-missing');
+
+    const panel = main.querySelector('.lab-relations-panel');
+    expect(panel?.textContent).toContain('Relacion invalida');
+    expect(panel?.textContent).toContain('Falta destino');
   });
 });

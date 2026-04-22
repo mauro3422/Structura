@@ -7,7 +7,8 @@ y el proyecto se adhiere a versionado semántico.
 
 ## Entradas Rápidas
 
-* [v1.2.5 - Panel de relaciones para tablas](./changelogs/v1.2.5.md) *(actual)*
+* [v1.2.6 - Etiquetas y validacion de relaciones](./changelogs/v1.2.6.md) *(actual)*
+* [v1.2.5 - Panel de relaciones para tablas](./changelogs/v1.2.5.md)
 * [v1.2.4 - Tests de interaccion para search y table](./changelogs/v1.2.4.md)
 * [v1.2.3 - Cobertura extra para lesson y widgets complejos](./changelogs/v1.2.3.md)
 * [v1.2.2 - Tests de contrato y smoke checks](./changelogs/v1.2.2.md)

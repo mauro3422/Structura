@@ -156,6 +156,18 @@
   color: var(--color-success);
 }
 
+.lab-relation-item--missing-target .lab-relation-item__role--source,
+.lab-relation-item--missing-reference .lab-relation-item__role--source {
+  background: rgba(245, 158, 11, 0.14);
+  color: var(--color-warning);
+}
+
+.lab-relation-item--missing-target .lab-relation-item__role--target,
+.lab-relation-item--missing-reference .lab-relation-item__role--target {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--color-warning);
+}
+
 .lab-relation-item__pair {
   font-size: var(--text-sm);
   font-weight: 700;
