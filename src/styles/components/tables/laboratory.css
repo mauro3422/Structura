@@ -73,10 +73,14 @@
 }
 
 .lab-rule-card {
-  padding: var(--sp-3);
+  padding: var(--sp-2);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
   background: rgba(15, 23, 42, 0.55);
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 0.4rem;
+  align-content: start;
 }
 
 .lab-rule-card--required {
@@ -100,8 +104,8 @@
 }
 
 .lab-rule-card__title {
-  margin-top: var(--sp-1);
-  font-size: var(--text-sm);
+  margin-top: 0;
+  font-size: 0.83rem;
   font-weight: 800;
   color: var(--text-primary);
   line-height: 1.25;
@@ -112,18 +116,24 @@
   padding: 0;
   list-style: none;
   color: var(--text-secondary);
-  font-size: var(--text-xs);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  font-size: 0.68rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  align-self: start;
 }
 
 .lab-rule-card__list li {
-  padding: 4px 8px;
+  padding: 3px 6px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border-subtle);
   background: rgba(59, 130, 246, 0.08);
   line-height: 1.2;
+  text-align: center;
+  min-height: 2.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .lab-table-item--observed-info {
