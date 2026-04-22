@@ -38,26 +38,41 @@ export class Router {
       this.container.style.transform = 'translateY(8px)';
 
       setTimeout(() => {
-        const content = handler(params);
-        
-        // Fix: Reset scroll to top on route change
-        window.scrollTo(0, 0);
+        try {
+          const content = handler(params);
 
-        if (typeof content === 'string') {
-          this.container.innerHTML = content;
-        } else if (content instanceof HTMLElement) {
-          this.container.innerHTML = '';
-          this.container.appendChild(content);
-        }
+          // Fix: Reset scroll to top on route change
+          window.scrollTo(0, 0);
 
-        // Call global navigate callback (for navbar updating)
-        if (this.onNavigate) this.onNavigate(hash);
+          if (typeof content === 'string') {
+            this.container.innerHTML = content;
+          } else if (content instanceof HTMLElement) {
+            this.container.innerHTML = '';
+            this.container.appendChild(content);
+          }
 
-        // Animate in new content
-        requestAnimationFrame(() => {
+          // Call global navigate callback (for navbar updating)
+          if (this.onNavigate) this.onNavigate(hash);
+
+          // Animate in new content
+          requestAnimationFrame(() => {
+            this.container.style.opacity = '1';
+            this.container.style.transform = 'translateY(0)';
+          });
+        } catch (error) {
+          console.error('Route render error:', error);
+          this.container.innerHTML = `
+            <section class="page page--error">
+              <div class="page-header">
+                <h1 class="page-title">Error al renderizar la ruta</h1>
+                <p class="page-subtitle">La vista no pudo construirse. Revisá la consola para más detalle.</p>
+              </div>
+              <pre class="fatal-error-box">${String(error && error.message ? error.message : error)}</pre>
+            </section>
+          `;
           this.container.style.opacity = '1';
           this.container.style.transform = 'translateY(0)';
-        });
+        }
       }, 150);
     }
   }
