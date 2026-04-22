@@ -14,6 +14,48 @@ import {
 import { createTableId, resolveLabTables } from './state.ts';
 import type { RenderLabTable, TableDefinition, TableSection } from './types.ts';
 
+function renderLaboratoryRulesPanel(labId: string): string {
+  return `
+    <div class="lab-rules-panel" id="${labId}-rules" aria-live="polite">
+      <div class="lab-rules-panel__header">
+        <div>
+          <div class="lab-rules-panel__title">Reglas del laboratorio</div>
+          <div class="lab-rules-panel__subtitle">Lo obligatorio, lo sugerido y lo que dejamos para una fase posterior</div>
+        </div>
+      </div>
+      <div class="lab-rules-grid">
+        <article class="lab-rule-card lab-rule-card--required">
+          <div class="lab-rule-card__label">Obligatorio</div>
+          <div class="lab-rule-card__title">La verdad del modelo vive en la FK y su destino</div>
+          <ul class="lab-rule-card__list">
+            <li>La FK debe apuntar a una tabla real.</li>
+            <li>Cada tabla necesita una PK visible.</li>
+            <li>Los nombres de tabla no deberían repetirse.</li>
+          </ul>
+        </article>
+        <article class="lab-rule-card lab-rule-card--suggested">
+          <div class="lab-rule-card__label">Sugerido</div>
+          <div class="lab-rule-card__title">Usar nombres claros sin bloquear minúsculas</div>
+          <ul class="lab-rule-card__list">
+            <li>snake_case o camelCase son válidos.</li>
+            <li>El sistema solo sugiere ordenar nombres inconsistentes.</li>
+            <li>1:N puede repetirse en detalle sin problema.</li>
+          </ul>
+        </article>
+        <article class="lab-rule-card lab-rule-card--future">
+          <div class="lab-rule-card__label">Fase 2</div>
+          <div class="lab-rule-card__title">Reglas más estrictas para modelado avanzado</div>
+          <ul class="lab-rule-card__list">
+            <li>PK compuestas.</li>
+            <li>Muchos a muchos con tabla puente.</li>
+            <li>FK únicas reales para 1:1 estricta.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  `;
+}
+
 export function renderTableExample(section: TableSection, index: number): string {
   const headers = (section.columns || []).map((col) => renderStaticHeaderCell(col)).join('');
   const rows = renderStaticRows(section.rows || [], index);
@@ -69,6 +111,7 @@ export function renderTableLaboratory(section: TableSection, index: number, less
   return `
     <div class="table-laboratory" id="${labId}" data-lesson-id="${lessonId}">
       ${renderLabTableToolbar(labId)}
+      ${renderLaboratoryRulesPanel(labId)}
       <div class="lab-observations-panel" id="${labId}-observations" aria-live="polite"></div>
       <div class="lab-canvas-wrapper">
         <svg class="lab-svg-layer" id="${labId}-svg"></svg>

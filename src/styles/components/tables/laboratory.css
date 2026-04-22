@@ -36,6 +36,84 @@
   gap: var(--sp-6);
 }
 
+.lab-rules-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.88), rgba(20, 28, 51, 0.96));
+}
+
+.lab-rules-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-3);
+}
+
+.lab-rules-panel__title {
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.lab-rules-panel__subtitle {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.lab-rules-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.lab-rule-card {
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.lab-rule-card--required {
+  border-left: 4px solid var(--color-danger);
+}
+
+.lab-rule-card--suggested {
+  border-left: 4px solid var(--color-primary);
+}
+
+.lab-rule-card--future {
+  border-left: 4px solid var(--color-warning);
+}
+
+.lab-rule-card__label {
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.lab-rule-card__title {
+  margin-top: var(--sp-1);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.lab-rule-card__list {
+  margin: var(--sp-2) 0 0;
+  padding-left: 1.1rem;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  display: grid;
+  gap: 0.35rem;
+}
+
 .lab-table-item--observed-info {
   box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35), 0 0 0 3px rgba(59, 130, 246, 0.08);
 }
