@@ -7,7 +7,8 @@ y el proyecto se adhiere a versionado semántico.
 
 ## Entradas Rápidas
 
-* [v1.2.3 - Cobertura extra para lesson y widgets complejos](./changelogs/v1.2.3.md) *(actual)*
+* [v1.2.4 - Tests de interaccion para search y table](./changelogs/v1.2.4.md) *(actual)*
+* [v1.2.3 - Cobertura extra para lesson y widgets complejos](./changelogs/v1.2.3.md)
 * [v1.2.2 - Tests de contrato y smoke checks](./changelogs/v1.2.2.md)
 * [v1.2.1 - Corte final de arquitectura, tablas y router](./changelogs/v1.2.1.md)
 * [v1.2.0 - Migración a TypeScript y limpieza de encoding](./changelogs/v1.2.0.md)
