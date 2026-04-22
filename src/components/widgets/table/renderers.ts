@@ -12,13 +12,14 @@ import {
   renderTableCaption,
 } from './markup.ts';
 import { resolveLabTables } from './state.ts';
-import type { TableDefinition, TableSection, RenderLabTable } from './types.ts';
+import type { RenderLabTable, TableDefinition, TableSection } from './types.ts';
 
 export function renderTableExample(section: TableSection, index: number): string {
   const headers = (section.columns || []).map((col) => renderStaticHeaderCell(col)).join('');
   const rows = renderStaticRows(section.rows || [], index);
 
-  return renderSectionBlock(`
+  return renderSectionBlock(
+    `
     ${renderTableCaption('📋', section.tableName)}
     <div class="data-table-wrapper">
       <table class="data-table">
@@ -26,10 +27,12 @@ export function renderTableExample(section: TableSection, index: number): string
         <tbody id="table-example-${index}-body">${rows}</tbody>
       </table>
     </div>
-  `, {
-    className: 'data-table-example',
-    index,
-  });
+  `,
+    {
+      className: 'data-table-example',
+      index,
+    },
+  );
 }
 
 export function renderInteractiveTable(section: TableSection, index: number, lessonId: string): string {
@@ -40,7 +43,8 @@ export function renderInteractiveTable(section: TableSection, index: number, les
   const addColHeader = canAddCols ? renderAddColumnHeader(tableId, columns.length) : '';
   const rows = renderInteractiveRows(section.initialRows || [], columns, { canAddCols });
 
-  return renderSectionBlock(`
+  return renderSectionBlock(
+    `
     ${renderTableCaption('✏️', section.tableName)}
     <div class="data-table-wrapper" id="${tableId}" data-table-name="${escapeHtml(section.tableName || '')}">
       <table class="data-table" id="${tableId}-table">
@@ -49,10 +53,12 @@ export function renderInteractiveTable(section: TableSection, index: number, les
       </table>
       ${section.canAddRows !== false ? renderAddRowButton(tableId, columns, section.initialRows?.length || 0, canAddCols) : ''}
     </div>
-  `, {
-    className: 'data-table-container',
-    index,
-  });
+  `,
+    {
+      className: 'data-table-container',
+      index,
+    },
+  );
 }
 
 export function renderTableLaboratory(section: TableSection, index: number, lessonId: string): string {
@@ -84,18 +90,26 @@ export function renderLabTable(
   const columns = table.columns || [];
   const rows = table.rows || [];
 
-  const headers = columns.map((col, ci) => `
+  const headers = columns
+    .map(
+      (col, ci) => `
     <th class="data-table__header-cell" data-pk="${col.isPK || false}" data-fk="${col.isFK || false}" data-col-index="${ci}">
       <div contenteditable="true" class="col-name-editable">${escapeHtml(col.name)}</div>
       <span class="col-type">${escapeHtml(col.type)}${col.autoIncrement ? ' AUTO' : ''}</span>
       <div class="col-metadata-toggles">
         <button class="meta-toggle ${col.isPK ? 'active' : ''}" data-action="toggle-pk" title="Clave primaria">🔑</button>
         <button class="meta-toggle is-fk ${col.isFK ? 'active' : ''}" data-action="toggle-fk" title="Clave foránea">🔗</button>
-        ${col.isFK ? `
+        ${
+          col.isFK
+            ? `
           <button class="cardinality-toggle" data-action="toggle-cardinality" title="Alternar cardinalidad" aria-label="Alternar cardinalidad de ${escapeHtml(col.name)}">${col.cardinality || '1:N'}</button>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
-      ${col.isFK ? `
+      ${
+        col.isFK
+          ? `
         <div class="ref-picker-container">
           <select class="ref-picker" data-action="change-ref" aria-label="Tabla referenciada por ${escapeHtml(col.name)}">
             <option value="">Ref: [Seleccionar]</option>
@@ -105,22 +119,35 @@ export function renderLabTable(
               .join('')}
           </select>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
       <button class="lab-col-delete" data-action="delete-col" title="Eliminar columna">×</button>
     </th>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  const bodyRows = rows.map((row, ri) => `
+  const bodyRows = rows
+    .map(
+      (row, ri) => `
     <tr data-row="${ri}">
-      ${row.map((cell, ci) => `
+      ${row
+        .map(
+          (cell, ci) => `
         <td ${ci > 0 || !columns[ci]?.autoIncrement ? 'contenteditable="true"' : ''} data-col="${ci}">${escapeHtml(String(cell))}</td>
-      `).join('')}
+      `,
+        )
+        .join('')}
       <td class="data-table__extra-col-cell"></td>
       <td class="lab-row-delete-cell"><button class="lab-row-delete" data-action="delete-row">×</button></td>
     </tr>
-  `).join('');
+  `,
+    )
+    .join('');
 
-  return renderSectionBlock(`
+  return renderSectionBlock(
+    `
     <div class="lab-table-header">
       <span class="table-name-display" contenteditable="true">${escapeHtml(table.tableName)}</span>
       <span class="edit-icon">✎</span>
@@ -136,11 +163,13 @@ export function renderLabTable(
         + Agregar fila
       </button>
     </div>
-  `, {
-    className: 'lab-table-item',
-    animationClass: 'anim-slide-up',
-    index: ti,
-    marginClass: '',
-    attrs: `data-index="${ti}"`,
-  });
+  `,
+    {
+      className: 'lab-table-item',
+      animationClass: 'anim-slide-up',
+      index: ti,
+      marginClass: '',
+      attrs: `data-index="${ti}"`,
+    },
+  );
 }

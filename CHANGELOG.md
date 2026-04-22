@@ -7,7 +7,8 @@ y el proyecto se adhiere a versionado semántico.
 
 ## Entradas Rápidas
 
-* [v1.2.0 - Migración a TypeScript y limpieza de encoding](./changelogs/v1.2.0.md) *(actual)*
+* [v1.2.1 - Corte final de arquitectura, tablas y router](./changelogs/v1.2.1.md) *(actual)*
+* [v1.2.0 - Migración a TypeScript y limpieza de encoding](./changelogs/v1.2.0.md)
 * [v1.1.1 - Pulido visual de diagramas y comparación DNS](./changelogs/v1.1.1.md)
 * [v1.1.0 - Estandarización de arquitectura y widgets](./changelogs/v1.1.0.md)
 * [v1.0.0 - Structura Launch 🚀](./changelogs/v1.0.0.md)

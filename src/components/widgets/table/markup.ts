@@ -48,15 +48,22 @@ export function renderInteractiveHeaderCell(col: TableColumn): string {
 }
 
 export function renderStaticRows(rows: TableCellValue[][], index: number): string {
-  return rows.map((row, ri) => renderSectionBlock(`
+  return rows
+    .map((row, ri) =>
+      renderSectionBlock(
+        `
     ${row.map((cell) => `<td>${escapeHtml(String(cell))}</td>`).join('')}
-  `, {
-    tag: 'tr',
-    animationClass: 'anim-row-slide-in',
-    index: index + ri,
-    delayStep: 0.1,
-    marginClass: '',
-  })).join('');
+  `,
+        {
+          tag: 'tr',
+          animationClass: 'anim-row-slide-in',
+          index: index + ri,
+          delayStep: 0.1,
+          marginClass: '',
+        },
+      ),
+    )
+    .join('');
 }
 
 export function renderInteractiveRows(
@@ -64,21 +71,32 @@ export function renderInteractiveRows(
   columns: TableColumn[],
   { canAddCols = false }: { canAddCols?: boolean } = {},
 ): string {
-  return (rows || []).map((row, ri) => renderSectionBlock(`
-    ${row.map((cell, ci) => `
+  return (rows || [])
+    .map((row, ri) =>
+      renderSectionBlock(
+        `
+    ${row
+      .map(
+        (cell, ci) => `
       <td ${ci > 0 || !columns[ci]?.autoIncrement ? 'contenteditable="true"' : ''}
           data-col="${ci}"
           data-placeholder="${escapeHtml(columns[ci]?.placeholder || '')}">${escapeHtml(String(cell))}</td>
-    `).join('')}
+    `,
+      )
+      .join('')}
     ${canAddCols ? '<td class="data-table__extra-col-cell"></td>' : ''}
-  `, {
-    tag: 'tr',
-    attrs: `data-row="${ri}"`,
-    animationClass: 'anim-row-slide-in',
-    index: ri,
-    delayStep: 0.1,
-    marginClass: '',
-  })).join('');
+  `,
+        {
+          tag: 'tr',
+          attrs: `data-row="${ri}"`,
+          animationClass: 'anim-row-slide-in',
+          index: ri,
+          delayStep: 0.1,
+          marginClass: '',
+        },
+      ),
+    )
+    .join('');
 }
 
 export function renderAddColumnHeader(tableId: string, columnCount: number): string {

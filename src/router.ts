@@ -1,28 +1,31 @@
+export type RouteParams = Record<string, string>;
+export type RouteHandler<T extends RouteParams = RouteParams> = (params: T) => string | HTMLElement | void;
+
 /**
  * DataLab Router - Simple hash-based SPA router
  */
 export class Router {
-  constructor() {
-    this.routes = new Map();
-    this.currentRoute = null;
-    this.container = null;
-    this.onNavigate = null;
+  private readonly routes = new Map<string, RouteHandler<any>>();
+  private currentRoute: string | null = null;
+  private container: HTMLElement | null = null;
+  onNavigate: ((hash: string) => void) | null = null;
 
+  constructor() {
     window.addEventListener('hashchange', () => this.handleRoute());
     window.addEventListener('popstate', () => this.handleRoute());
   }
 
-  setContainer(element) {
+  setContainer(element: HTMLElement) {
     this.container = element;
     return this;
   }
 
-  on(path, handler) {
-    this.routes.set(path, handler);
+  on<T extends RouteParams = RouteParams>(path: string, handler: RouteHandler<T>) {
+    this.routes.set(path, handler as RouteHandler<any>);
     return this;
   }
 
-  navigate(path) {
+  navigate(path: string) {
     window.location.hash = path;
   }
 
@@ -33,7 +36,6 @@ export class Router {
     if (handler && this.container) {
       this.currentRoute = hash;
 
-      // Animate out current content
       this.container.style.opacity = '0';
       this.container.style.transform = 'translateY(8px)';
 
@@ -41,33 +43,32 @@ export class Router {
         try {
           const content = handler(params);
 
-          // Fix: Reset scroll to top on route change
           window.scrollTo(0, 0);
 
           if (typeof content === 'string') {
-            this.container.innerHTML = content;
+            this.container!.innerHTML = content;
           } else if (content instanceof HTMLElement) {
-            this.container.innerHTML = '';
-            this.container.appendChild(content);
+            this.container!.innerHTML = '';
+            this.container!.appendChild(content);
           }
 
-          // Call global navigate callback (for navbar updating)
           if (this.onNavigate) this.onNavigate(hash);
 
-          // Animate in new content
           requestAnimationFrame(() => {
+            if (!this.container) return;
             this.container.style.opacity = '1';
             this.container.style.transform = 'translateY(0)';
           });
         } catch (error) {
           console.error('Route render error:', error);
+          if (!this.container) return;
           this.container.innerHTML = `
             <section class="page page--error">
               <div class="page-header">
                 <h1 class="page-title">Error al renderizar la ruta</h1>
                 <p class="page-subtitle">La vista no pudo construirse. Revisá la consola para más detalle.</p>
               </div>
-              <pre class="fatal-error-box">${String(error && error.message ? error.message : error)}</pre>
+              <pre class="fatal-error-box">${String(error instanceof Error ? error.message : error)}</pre>
             </section>
           `;
           this.container.style.opacity = '1';
@@ -77,20 +78,18 @@ export class Router {
     }
   }
 
-  matchRoute(hash) {
-    // Exact match first
+  private matchRoute(hash: string): { handler: RouteHandler<any> | undefined; params: RouteParams } {
     if (this.routes.has(hash)) {
       return { handler: this.routes.get(hash), params: {} };
     }
 
-    // Pattern matching (e.g., /lesson/:id)
     for (const [pattern, handler] of this.routes) {
       const patternParts = pattern.split('/');
       const hashParts = hash.split('/');
 
       if (patternParts.length !== hashParts.length) continue;
 
-      const params = {};
+      const params: RouteParams = {};
       let match = true;
 
       for (let i = 0; i < patternParts.length; i++) {
@@ -105,7 +104,6 @@ export class Router {
       if (match) return { handler, params };
     }
 
-    // Fallback to home
     return { handler: this.routes.get('/'), params: {} };
   }
 

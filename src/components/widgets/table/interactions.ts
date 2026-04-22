@@ -80,7 +80,13 @@ export function setupInteractiveTables(renderLabTable: RenderLabTable): void {
             showStatus(labId, 'La tabla necesita al menos una columna');
             return;
           }
-          if (col?.isPK && !(await showConfirm('¿Eliminar clave primaria?', 'Esta columna identifica los registros. Si la eliminas, la tabla quedará sin PK hasta que marques otra.'))) {
+          if (
+            col?.isPK &&
+            !(await showConfirm(
+              '¿Eliminar clave primaria?',
+              'Esta columna identifica los registros. Si la eliminas, la tabla quedará sin PK hasta que marques otra.',
+            ))
+          ) {
             return;
           }
           updateLab(renderLabTable, labId, (liveTables) => {

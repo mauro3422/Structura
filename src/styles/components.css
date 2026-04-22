@@ -1,8 +1,11 @@
-﻿@import './components/cards.css';
+@import './components/cards.css';
 @import './components/navigation.css';
 @import './components/actions.css';
 @import './components/content.css';
-@import './components/tables.css';
+@import './components/tables/data-table.css';
+@import './components/tables/laboratory.css';
+@import './components/tables/relationships.css';
+@import './components/tables/controls.css';
 @import './components/progress.css';
 @import './components/lesson-sections.css';
 @import './components/widgets.css';

@@ -1,5 +1,5 @@
-﻿import { Router } from '../router.js';
-import { createNavbar, updateNavbar } from '../components/navbar.js';
+import { Router } from '../router.ts';
+import { createNavbar, updateNavbar } from '../components/navbar.ts';
 import { renderHome } from '../pages/home.ts';
 import { renderModules, renderModuleDetail } from '../pages/modules.ts';
 import { renderLesson } from '../pages/lesson.ts';
@@ -11,7 +11,7 @@ import { bindInteractions } from './interactions/index.ts';
 export function initApp() {
   initializeMermaid();
 
-  window.markCompleted = function(lessonId) {
+  window.markCompleted = function (lessonId) {
     Progress.markLessonCompleted(lessonId);
   };
 
@@ -43,4 +43,3 @@ export function initApp() {
 
   router.start();
 }
-
