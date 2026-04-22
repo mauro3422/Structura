@@ -115,6 +115,11 @@
   border-left-color: var(--color-warning);
 }
 
+.lab-relation-item--caution {
+  border-left-color: var(--color-warning);
+  background: rgba(245, 158, 11, 0.08);
+}
+
 .lab-relation-item__top,
 .lab-relation-item__bottom {
   display: flex;
@@ -125,6 +130,30 @@
 
 .lab-relation-item__top {
   margin-bottom: var(--sp-1);
+}
+
+.lab-relation-item__roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.lab-relation-item__role {
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+.lab-relation-item__role--source {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--color-primary);
+}
+
+.lab-relation-item__role--target {
+  background: rgba(16, 185, 129, 0.14);
+  color: var(--color-success);
 }
 
 .lab-relation-item__pair {

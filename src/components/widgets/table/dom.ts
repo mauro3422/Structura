@@ -54,6 +54,14 @@ function normalizeCardinality(value: string | undefined): string {
   return '1:N';
 }
 
+function describeRoles(cardinality: string): { sourceRole: string; targetRole: string } {
+  if (cardinality === '1:1') {
+    return { sourceRole: 'lado FK', targetRole: 'referencia sugerida' };
+  }
+
+  return { sourceRole: 'detalle', targetRole: 'maestra' };
+}
+
 function collectRelationships(labId: string): TableRelationship[] {
   const canvas = document.getElementById(`${labId}-canvas`);
   if (!canvas) return [];
@@ -77,7 +85,9 @@ function collectRelationships(labId: string): TableRelationship[] {
 
       const sourceColumn = th.querySelector<HTMLElement>('.col-name-editable')?.textContent?.trim() || 'Columna';
       const targetTable = th.querySelector<HTMLSelectElement>('.ref-picker')?.value?.trim() || '';
+      const sourceIsPk = th.dataset.pk === 'true';
       const cardinality = normalizeCardinality(th.querySelector<HTMLElement>('.cardinality-toggle')?.textContent?.trim());
+      const roles = describeRoles(cardinality);
 
       if (!targetTable) {
         relationships.push({
@@ -85,23 +95,32 @@ function collectRelationships(labId: string): TableRelationship[] {
           sourceColumn,
           targetTable: 'Sin destino',
           cardinality,
+          sourceRole: 'origen',
+          targetRole: 'pendiente',
           status: 'missing-reference',
-          message: 'Elegí una tabla destino para cerrar la relación.',
+          message: 'Elegir una tabla destino para cerrar la relacion.',
         });
         return;
       }
+
+      const targetExists = names.has(targetTable);
+      const caution = targetExists && cardinality === '1:1' && !sourceIsPk;
 
       relationships.push({
         sourceTable,
         sourceColumn,
         targetTable,
         cardinality,
-        status: names.has(targetTable) ? 'linked' : 'missing-target',
-        message: names.has(targetTable)
+        sourceRole: roles.sourceRole,
+        targetRole: roles.targetRole,
+        status: targetExists ? (caution ? 'caution' : 'linked') : 'missing-target',
+        message: targetExists
           ? cardinality === '1:1'
-            ? 'Relación uno a uno detectada.'
-            : 'Relación uno a muchos detectada.'
-          : 'La tabla destino no está disponible en el laboratorio.',
+            ? caution
+              ? '1:1 detectada. Para que sea estricta, conviene que la FK sea unica o compartida con la PK.'
+              : '1:1 detectada. La tabla destino funciona como referencia principal.'
+            : '1:N detectada. La tabla destino actua como maestra y la actual como detalle.'
+          : 'La tabla destino no esta disponible en el laboratorio.',
       });
     });
   });
@@ -113,15 +132,21 @@ function renderRelationshipItem(item: TableRelationship): string {
   const stateLabel =
     item.status === 'linked'
       ? 'OK'
-      : item.status === 'missing-target'
-        ? 'Destino ausente'
-        : 'Falta destino';
+      : item.status === 'caution'
+        ? 'Revisar'
+        : item.status === 'missing-target'
+          ? 'Destino ausente'
+          : 'Falta destino';
 
   return `
     <div class="lab-relation-item lab-relation-item--${item.status}">
       <div class="lab-relation-item__top">
         <span class="lab-relation-item__pair">${escapeHtml(item.sourceTable)}.${escapeHtml(item.sourceColumn)} → ${escapeHtml(item.targetTable)}</span>
         <span class="lab-relation-item__badge">${escapeHtml(item.cardinality)}</span>
+      </div>
+      <div class="lab-relation-item__roles">
+        <span class="lab-relation-item__role lab-relation-item__role--source">${escapeHtml(item.sourceRole)}</span>
+        <span class="lab-relation-item__role lab-relation-item__role--target">${escapeHtml(item.targetRole)}</span>
       </div>
       <div class="lab-relation-item__bottom">
         <span class="lab-relation-item__state">${escapeHtml(stateLabel)}</span>
@@ -136,17 +161,19 @@ export function renderRelationshipsPanel(labId: string, relationships: TableRela
   if (!panel) return;
 
   const linkedCount = relationships.filter((item) => item.status === 'linked').length;
-  const missingCount = relationships.length - linkedCount;
+  const cautionCount = relationships.filter((item) => item.status === 'caution').length;
+  const missingCount = relationships.length - linkedCount - cautionCount;
 
   panel.innerHTML = `
     <div class="lab-relations-panel__header">
       <div>
         <div class="lab-relations-panel__title">Panel de relaciones</div>
-        <div class="lab-relations-panel__subtitle">Detecta FKs, destinos y cardinalidad</div>
+        <div class="lab-relations-panel__subtitle">Detecta FKs, destinos, cardinalidad y rol sugerido</div>
       </div>
       <div class="lab-relations-panel__stats">
         <span class="lab-relations-panel__chip">${relationships.length} total</span>
-        <span class="lab-relations-panel__chip ${missingCount > 0 ? 'is-warning' : 'is-ok'}">${linkedCount} vinculadas</span>
+        <span class="lab-relations-panel__chip ${missingCount > 0 || cautionCount > 0 ? 'is-warning' : 'is-ok'}">${linkedCount} vinculadas</span>
+        ${cautionCount > 0 ? `<span class="lab-relations-panel__chip is-warning">${cautionCount} a revisar</span>` : ''}
       </div>
     </div>
     ${
@@ -158,7 +185,7 @@ export function renderRelationshipsPanel(labId: string, relationships: TableRela
         `
         : `
           <div class="lab-relations-empty">
-            No hay relaciones definidas todavía. Marcá una columna como FK y elegí su tabla destino para empezar.
+            No hay relaciones definidas todavia. Marca una columna como FK y elige su tabla destino para empezar.
           </div>
         `
     }

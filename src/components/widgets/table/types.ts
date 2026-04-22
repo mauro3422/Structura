@@ -22,7 +22,9 @@ export interface TableRelationship {
   sourceColumn: string;
   targetTable: string;
   cardinality: string;
-  status: 'linked' | 'missing-target' | 'missing-reference';
+  sourceRole: string;
+  targetRole: string;
+  status: 'linked' | 'caution' | 'missing-target' | 'missing-reference';
   message: string;
 }
 

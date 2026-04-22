@@ -3,7 +3,7 @@ import { renderTableLaboratory } from '../src/components/widgets/table/renderers
 import { updateRelationships } from '../src/components/widgets/table/dom.ts';
 
 describe('Table relationship panel', () => {
-  it('lists linked relationships and cardinality', () => {
+  it('describes 1:N as master/detail', () => {
     document.body.innerHTML = '<main id="main-content"></main>';
     const main = document.getElementById('main-content') as HTMLElement;
 
@@ -37,9 +37,48 @@ describe('Table relationship panel', () => {
     updateRelationships('table-lab-demo');
 
     const panel = main.querySelector('.lab-relations-panel');
-    expect(panel?.textContent).toContain('Panel de relaciones');
     expect(panel?.textContent).toContain('Pedidos.cliente_id → Clientes');
-    expect(panel?.textContent).toContain('1:N');
-    expect(panel?.textContent).toContain('Relación uno a muchos detectada.');
+    expect(panel?.textContent).toContain('detalle');
+    expect(panel?.textContent).toContain('maestra');
+    expect(panel?.textContent).toContain('1:N detectada. La tabla destino actua como maestra y la actual como detalle.');
+  });
+
+  it('flags 1:1 without a shared key as a caution', () => {
+    document.body.innerHTML = '<main id="main-content"></main>';
+    const main = document.getElementById('main-content') as HTMLElement;
+
+    main.innerHTML = renderTableLaboratory(
+      {
+        type: 'table-laboratory',
+        initialTables: [
+          {
+            tableName: 'Usuarios',
+            columns: [
+              { name: 'ID', type: 'INT', isPK: true },
+              { name: 'Nombre', type: 'TEXT' },
+            ],
+            rows: [[1, 'Ana']],
+          },
+          {
+            tableName: 'Perfiles',
+            columns: [
+              { name: 'ID', type: 'INT', isPK: true },
+              { name: 'usuario_id', type: 'INT', isFK: true, references: 'Usuarios', cardinality: '1:1' },
+              { name: 'Bio', type: 'TEXT' },
+            ],
+            rows: [[1, 1, 'Perfil']],
+          },
+        ],
+      },
+      0,
+      'demo-1-1',
+    );
+
+    updateRelationships('table-lab-demo-1-1');
+
+    const panel = main.querySelector('.lab-relations-panel');
+    expect(panel?.textContent).toContain('Revisar');
+    expect(panel?.textContent).toContain('referencia sugerida');
+    expect(panel?.textContent).toContain('conviene que la FK sea unica o compartida con la PK.');
   });
 });
