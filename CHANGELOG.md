@@ -7,7 +7,8 @@ y el proyecto se adhiere a versionado semántico.
 
 ## Entradas Rápidas
 
-* [v1.2.16 - Reglas del laboratorio en una sola columna](./changelogs/v1.2.16.md) *(actual)*
+* [v1.2.17 - Encabezado horizontal en reglas](./changelogs/v1.2.17.md) *(actual)*
+* [v1.2.16 - Reglas del laboratorio en una sola columna](./changelogs/v1.2.16.md)
 * [v1.2.15 - Tarjetas de reglas mas compactas](./changelogs/v1.2.15.md)
 * [v1.2.14 - Panel de reglas compactado en columnas](./changelogs/v1.2.14.md)
 * [v1.2.13 - Relaciones directas y derivadas separadas en el panel](./changelogs/v1.2.13.md)

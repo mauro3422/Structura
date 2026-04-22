@@ -78,9 +78,16 @@
   border: 1px solid var(--border-default);
   background: rgba(15, 23, 42, 0.55);
   display: grid;
-  grid-template-rows: auto auto 1fr;
-  gap: 0.4rem;
+  grid-template-rows: auto 1fr;
+  gap: 0.45rem;
   align-content: start;
+}
+
+.lab-rule-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .lab-rule-card--required {
@@ -101,14 +108,16 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .lab-rule-card__title {
   margin-top: 0;
-  font-size: 0.83rem;
+  font-size: 0.78rem;
   font-weight: 800;
   color: var(--text-primary);
   line-height: 1.25;
+  text-align: right;
 }
 
 .lab-rule-card__list {

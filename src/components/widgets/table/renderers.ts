@@ -25,8 +25,10 @@ function renderLaboratoryRulesPanel(labId: string): string {
       </div>
       <div class="lab-rules-grid">
         <article class="lab-rule-card lab-rule-card--required">
-          <div class="lab-rule-card__label">Obligatorio</div>
-          <div class="lab-rule-card__title">FK real y PK visible</div>
+          <div class="lab-rule-card__head">
+            <div class="lab-rule-card__label">Obligatorio</div>
+            <div class="lab-rule-card__title">FK real y PK visible</div>
+          </div>
           <ul class="lab-rule-card__list">
             <li>FK → tabla real</li>
             <li>PK visible por tabla</li>
@@ -34,8 +36,10 @@ function renderLaboratoryRulesPanel(labId: string): string {
           </ul>
         </article>
         <article class="lab-rule-card lab-rule-card--suggested">
-          <div class="lab-rule-card__label">Sugerido</div>
-          <div class="lab-rule-card__title">Nombres claros, sin bloquear minúsculas</div>
+          <div class="lab-rule-card__head">
+            <div class="lab-rule-card__label">Sugerido</div>
+            <div class="lab-rule-card__title">Nombres claros</div>
+          </div>
           <ul class="lab-rule-card__list">
             <li>snake_case o camelCase</li>
             <li>Nombres consistentes</li>
@@ -45,8 +49,10 @@ function renderLaboratoryRulesPanel(labId: string): string {
           </ul>
         </article>
         <article class="lab-rule-card lab-rule-card--future">
-          <div class="lab-rule-card__label">Fase 2</div>
-          <div class="lab-rule-card__title">Reglas más estrictas</div>
+          <div class="lab-rule-card__head">
+            <div class="lab-rule-card__label">Fase 2</div>
+            <div class="lab-rule-card__title">Reglas estrictas</div>
+          </div>
           <ul class="lab-rule-card__list">
             <li>PK compuestas reales</li>
             <li>FK única para 1:1</li>
