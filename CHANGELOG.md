@@ -7,6 +7,7 @@ y el proyecto se adhiere a versionado semÃ¡ntico.
 
 ## Entradas RÃ¡pidas
 
+* [v1.2.23 - Fallback de nombres y QA de relaciones](./changelogs/v1.2.23.md) *(actual)*
 * [v1.2.22 - Limpieza final de navegador y favicon](./changelogs/v1.2.22.md) *(actual)*
 * [v1.2.21 - Limpieza de encoding visible en tablas](./changelogs/v1.2.21.md)
 * [v1.2.20 - Ayuda contextual por chip en reglas](./changelogs/v1.2.20.md)

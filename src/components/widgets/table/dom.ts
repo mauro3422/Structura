@@ -83,6 +83,11 @@ function getTableName(item: HTMLElement): string {
   return item.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || '';
 }
 
+function getDisplayTableName(item: HTMLElement): string {
+  const name = getTableName(item);
+  return name || 'Tabla sin nombre';
+}
+
 function getCardinality(th: HTMLElement): string {
   return normalizeCardinality(th.querySelector<HTMLElement>('.cardinality-toggle')?.textContent?.trim());
 }
@@ -102,7 +107,7 @@ function collectRelationshipRecords(labId: string): RelationshipRecord[] {
 
   tables.forEach((item) => {
     const sourceTableId = getTableId(item);
-    const sourceTable = getTableName(item);
+    const sourceTable = getDisplayTableName(item);
     const wrapper = item.querySelector<HTMLElement>('.data-table-wrapper');
     if (!wrapper) return;
 
@@ -112,7 +117,7 @@ function collectRelationshipRecords(labId: string): RelationshipRecord[] {
       const sourceColumn = th.querySelector<HTMLElement>('.col-name-editable')?.textContent?.trim() || 'Columna';
       const targetTableId = th.querySelector<HTMLSelectElement>('.ref-picker')?.value?.trim() || '';
       const targetItem = tablesById.get(targetTableId);
-      const targetTable = targetItem?.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || targetTableId;
+      const targetTable = targetItem ? getDisplayTableName(targetItem) : targetTableId;
       const sourceIsPk = th.dataset.pk === 'true';
       const cardinality = getCardinality(th);
       const roles = describeRoles(cardinality);
@@ -503,8 +508,8 @@ function renderRelationshipItem(item: TableRelationship): string {
 
   const pairLabel =
     item.relationshipKind === 'derived'
-      ? `${item.sourceTable} ↔ ${item.targetTable}`
-      : `${item.sourceTable}.${item.sourceColumn} → ${item.targetTable}`;
+      ? `${item.sourceTable || 'Tabla sin nombre'} <-> ${item.targetTable || 'Tabla sin nombre'}`
+      : `${item.sourceTable || 'Tabla sin nombre'}.${item.sourceColumn} -> ${item.targetTable || 'Sin destino'}`;
 
   return `
     <div class="lab-relation-item lab-relation-item--${item.status} lab-relation-item--${item.relationshipKind}">
