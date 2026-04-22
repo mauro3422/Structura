@@ -11,6 +11,28 @@ function getTargetLab(target: HTMLElement): HTMLElement | null {
   return target.closest('.table-laboratory') as HTMLElement | null;
 }
 
+function updateRuleHelp(chip: HTMLElement): void {
+  const card = chip.closest('.lab-rule-card') as HTMLElement | null;
+  if (!card) return;
+
+  const title = chip.getAttribute('data-rule-help-title') || 'Ayuda rápida';
+  const text = chip.getAttribute('data-rule-help-text') || 'Tocá otro chip para ver una pista distinta.';
+
+  const titleEl = card.querySelector<HTMLElement>('[data-rule-help-title]');
+  const textEl = card.querySelector<HTMLElement>('[data-rule-help-text]');
+
+  if (titleEl) titleEl.textContent = title;
+  if (textEl) textEl.textContent = text;
+
+  card.querySelectorAll<HTMLElement>('.lab-rule-chip').forEach((button) => {
+    button.classList.remove('is-active');
+    button.setAttribute('aria-pressed', 'false');
+  });
+
+  chip.classList.add('is-active');
+  chip.setAttribute('aria-pressed', 'true');
+}
+
 export function setupInteractiveTables(renderLabTable: RenderLabTable): void {
   const container = document.getElementById('main-content');
   if (!container) return;
@@ -27,6 +49,13 @@ export function setupInteractiveTables(renderLabTable: RenderLabTable): void {
       const lab = getTargetLab(target);
       if (!lab) return;
       const labId = lab.id;
+
+      const ruleChip = target.closest('.lab-rule-chip') as HTMLElement | null;
+      if (ruleChip) {
+        event.preventDefault();
+        updateRuleHelp(ruleChip);
+        return;
+      }
 
       if (target.closest('[id$="-add-table"]')) {
         updateLab(renderLabTable, labId, (tables) => {

@@ -161,28 +161,98 @@
   line-height: 1.4;
 }
 
+.lab-rule-card__helper {
+  display: grid;
+  gap: 3px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.lab-rule-card__helper-kicker {
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lab-rule-card__helper-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.lab-rule-card__helper-text {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.lab-rule-card__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.lab-rule-card__toolbar-label {
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lab-rule-card__toolbar-copy {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
 .lab-rule-card__list {
   margin: 0;
   padding: 0;
   list-style: none;
-  color: var(--text-secondary);
-  font-size: 0.68rem;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
 }
 
 .lab-rule-card__list li {
-  padding: 3px 6px;
-  border-radius: var(--radius-full);
+  margin: 0;
+  flex: 1 1 calc(50% - 0.45rem);
+  min-width: 0;
+}
+
+.lab-rule-chip {
+  width: 100%;
+  appearance: none;
   border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
   background: rgba(59, 130, 246, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.68rem;
   line-height: 1.2;
+  padding: 0.45rem 0.65rem;
   text-align: left;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  cursor: pointer;
+  transition: transform var(--transition-base), border-color var(--transition-base), background var(--transition-base), color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.lab-rule-chip:hover,
+.lab-rule-chip:focus-visible,
+.lab-rule-chip.is-active {
+  color: var(--text-primary);
+  border-color: rgba(59, 130, 246, 0.7);
+  background: rgba(59, 130, 246, 0.18);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+.lab-rule-chip:focus-visible {
+  outline: none;
 }
 
 @media (max-width: 720px) {
@@ -201,7 +271,11 @@
   }
 
   .lab-rule-card__list {
-    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .lab-rule-card__list li {
+    flex-basis: 100%;
   }
 }
 

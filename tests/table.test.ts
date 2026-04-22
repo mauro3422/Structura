@@ -72,6 +72,8 @@ describe('Table renderers', () => {
     expect(html).toContain('table-laboratory');
     expect(html).toContain('Guardar laboratorio');
     expect(html).toContain('Reglas del laboratorio');
+    expect(html).toContain('data-rule-help-panel');
+    expect(html).toContain('lab-rule-chip');
     expect(labTable).toContain('lab-table-header');
     expect(labTable).toContain('Personas');
     expect(labTable).toContain('lab-row-delete');
