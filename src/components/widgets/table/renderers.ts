@@ -69,6 +69,7 @@ export function renderTableLaboratory(section: TableSection, index: number, less
   return `
     <div class="table-laboratory" id="${labId}" data-lesson-id="${lessonId}">
       ${renderLabTableToolbar(labId)}
+      <div class="lab-observations-panel" id="${labId}-observations" aria-live="polite"></div>
       <div class="lab-canvas-wrapper">
         <svg class="lab-svg-layer" id="${labId}-svg"></svg>
         <div class="lab-canvas" id="${labId}-canvas">

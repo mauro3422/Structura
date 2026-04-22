@@ -1,5 +1,5 @@
 import { createDefaultLabTables } from './markup.ts';
-import { getLabState, renderCanvas, updateRelationships } from './dom.ts';
+import { getLabState, renderCanvas, updateObservations, updateRelationships } from './dom.ts';
 import type { RenderLabTable, TableDefinition, TableSection } from './types.ts';
 
 export function getDefaultLabTables(): TableDefinition[] {
@@ -72,6 +72,7 @@ export function runValidation(labId: string): void {
   });
 
   updateRelationships(labId);
+  updateObservations(labId);
 }
 
 export function showStatus(labId: string, msg: string): void {

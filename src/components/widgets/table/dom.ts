@@ -1,5 +1,5 @@
 import { escapeHtml } from '../Utils.ts';
-import type { RenderLabTable, TableDefinition, TableRelationship } from './types.ts';
+import type { RenderLabTable, TableDefinition, TableObservation, TableRelationship } from './types.ts';
 
 export function getLabState(labId: string): TableDefinition[] {
   const lab = document.getElementById(labId);
@@ -60,6 +60,190 @@ function describeRoles(cardinality: string): { sourceRole: string; targetRole: s
   }
 
   return { sourceRole: 'Detalle', targetRole: 'Maestra' };
+}
+
+function isAcronym(value: string): boolean {
+  return /^[A-Z0-9]{2,}$/.test(value);
+}
+
+function isCamelCaseLike(value: string): boolean {
+  return /^[a-z][A-Za-z0-9]*$/.test(value);
+}
+
+function toCamelCase(value: string): string {
+  const parts = value
+    .replace(/[^A-Za-z0-9]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (parts.length === 0) return value;
+
+  return parts
+    .map((part, index) => {
+      const lower = part.toLowerCase();
+      if (index === 0) return lower;
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join('');
+}
+
+function collectObservations(labId: string): TableObservation[] {
+  const canvas = document.getElementById(`${labId}-canvas`);
+  if (!canvas) return [];
+
+  const tables = Array.from(canvas.querySelectorAll<HTMLElement>('.lab-table-item'));
+  const observations: TableObservation[] = [];
+  const tableNames = new Map<string, number>();
+
+  tables.forEach((item) => {
+    const tableName = item.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || '';
+    if (!tableName) {
+      observations.push({
+        kind: 'error',
+        title: 'Nombre de tabla vacío',
+        message: 'Cada tabla debería tener un nombre visible.',
+        hint: 'Poné un nombre corto y claro, por ejemplo clientes o pedidos.',
+      });
+    } else {
+      tableNames.set(tableName, (tableNames.get(tableName) || 0) + 1);
+      if (tableName.includes('_') || tableName.includes(' ')) {
+        observations.push({
+          kind: 'info',
+          title: 'Sugerencia de nombre de tabla',
+          message: `La tabla "${tableName}" funciona, pero podrías escribirla con camelCase para mantener el estilo.`,
+          hint: `Sugerencia: ${toCamelCase(tableName)}`,
+          subject: tableName,
+        });
+      }
+    }
+
+    const wrapper = item.querySelector<HTMLElement>('.data-table-wrapper');
+    if (!wrapper) return;
+
+    const columns = Array.from(wrapper.querySelectorAll<HTMLTableCellElement>('thead th[data-col-index]'));
+    const seenColumns = new Set<string>();
+    let hasPk = false;
+
+    columns.forEach((th) => {
+      const colName = th.querySelector<HTMLElement>('.col-name-editable')?.textContent?.trim() || '';
+      const isPk = th.dataset.pk === 'true';
+      const isFk = th.dataset.fk === 'true';
+      const targetTable = th.querySelector<HTMLSelectElement>('.ref-picker')?.value?.trim() || '';
+      const cardinality = normalizeCardinality(th.querySelector<HTMLElement>('.cardinality-toggle')?.textContent?.trim());
+      const sourceIsPk = isPk;
+
+      if (isPk) hasPk = true;
+
+      if (colName) {
+        if (seenColumns.has(colName)) {
+          observations.push({
+            kind: 'error',
+            title: 'Columna duplicada',
+            message: `La columna "${colName}" se repite dentro de la misma tabla.`,
+            hint: 'Usá un nombre único para cada campo.',
+            subject: colName,
+          });
+        }
+        seenColumns.add(colName);
+
+        if (!isAcronym(colName) && !isCamelCaseLike(colName)) {
+          observations.push({
+            kind: 'info',
+            title: 'Sugerencia camelCase',
+            message: `La columna "${colName}" se entiende, pero camelCase suele ser más consistente para variables.`,
+            hint: `Sugerencia: ${toCamelCase(colName)}`,
+            subject: colName,
+          });
+        }
+      }
+
+      if (isFk && !targetTable) {
+        observations.push({
+          kind: 'error',
+          title: 'Relación inválida',
+          message: `La columna "${colName || 'sin nombre'}" está marcada como FK pero no apunta a ninguna tabla.`,
+          hint: 'Elegí una tabla destino para cerrar el enlace.',
+          subject: colName || undefined,
+        });
+      }
+
+      if (isFk && targetTable && cardinality === '1:1' && !sourceIsPk) {
+        observations.push({
+          kind: 'warning',
+          title: '1:1 a revisar',
+          message: `La relación "${colName || 'FK'} → ${targetTable}" parece 1:1, pero la FK no es PK.`,
+          hint: 'Si querés 1:1 estricta, la FK debería ser única o compartir la PK.',
+          subject: colName || undefined,
+        });
+      }
+    });
+
+    if (!hasPk) {
+      observations.push({
+        kind: 'warning',
+        title: 'Falta clave primaria',
+        message: `La tabla "${tableName || 'sin nombre'}" no tiene PK marcada.`,
+        hint: 'Una tabla base normalmente debería tener una clave primaria.',
+        subject: tableName || undefined,
+      });
+    }
+  });
+
+  tableNames.forEach((count, name) => {
+    if (count > 1) {
+      observations.push({
+        kind: 'error',
+        title: 'Nombre de tabla duplicado',
+        message: `Hay ${count} tablas con el nombre "${name}".`,
+        hint: 'Cada tabla debería tener un nombre distinto para evitar confusiones.',
+        subject: name,
+      });
+    }
+  });
+
+  return observations;
+}
+
+function renderObservationItem(observation: TableObservation): string {
+  return `
+    <div class="lab-observation-item lab-observation-item--${observation.kind}">
+      <div class="lab-observation-item__head">
+        <span class="lab-observation-item__title">${escapeHtml(observation.title)}</span>
+        <span class="lab-observation-item__kind">${escapeHtml(observation.kind)}</span>
+      </div>
+      <div class="lab-observation-item__message">${escapeHtml(observation.message)}</div>
+      ${observation.hint ? `<div class="lab-observation-item__hint">${escapeHtml(observation.hint)}</div>` : ''}
+      ${observation.subject ? `<div class="lab-observation-item__subject">${escapeHtml(observation.subject)}</div>` : ''}
+    </div>
+  `;
+}
+
+export function renderObservationsPanel(labId: string, observations: TableObservation[]): void {
+  const panel = document.getElementById(`${labId}-observations`);
+  if (!panel) return;
+
+  const errorCount = observations.filter((item) => item.kind === 'error').length;
+  const warningCount = observations.filter((item) => item.kind === 'warning').length;
+
+  panel.innerHTML = `
+    <div class="lab-observations-panel__header">
+      <div>
+        <div class="lab-observations-panel__title">Observaciones</div>
+        <div class="lab-observations-panel__subtitle">Sugerencias y alertas para modelar mejor tus tablas</div>
+      </div>
+      <div class="lab-observations-panel__stats">
+        <span class="lab-observations-panel__chip">${observations.length} total</span>
+        ${warningCount > 0 ? `<span class="lab-observations-panel__chip is-warning">${warningCount} avisos</span>` : ''}
+        ${errorCount > 0 ? `<span class="lab-observations-panel__chip is-danger">${errorCount} errores</span>` : ''}
+      </div>
+    </div>
+    ${
+      observations.length > 0
+        ? `<div class="lab-observations-list">${observations.map((item) => renderObservationItem(item)).join('')}</div>`
+        : `<div class="lab-observations-empty">No hay observaciones por ahora. Tu modelo está bastante limpio.</div>`
+    }
+  `;
 }
 
 function collectRelationships(labId: string): TableRelationship[] {
@@ -190,6 +374,10 @@ export function renderRelationshipsPanel(labId: string, relationships: TableRela
         `
     }
   `;
+}
+
+export function updateObservations(labId: string): void {
+  renderObservationsPanel(labId, collectObservations(labId));
 }
 
 export function updateRelationships(labId: string): void {

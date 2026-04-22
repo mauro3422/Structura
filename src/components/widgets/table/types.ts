@@ -28,6 +28,14 @@ export interface TableRelationship {
   message: string;
 }
 
+export interface TableObservation {
+  kind: 'info' | 'warning' | 'error';
+  title: string;
+  message: string;
+  hint?: string;
+  subject?: string;
+}
+
 export interface TableSection {
   tableName?: string;
   columns?: TableColumn[];
