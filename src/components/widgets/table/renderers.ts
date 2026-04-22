@@ -195,7 +195,7 @@ export function renderTableExample(section: TableSection, index: number): string
 
   return renderSectionBlock(
     `
-    ${renderTableCaption('Ã°Å¸â€œâ€¹', section.tableName)}
+    ${renderTableCaption('📖', section.tableName)}
     <div class="data-table-wrapper">
       <table class="data-table">
         <thead><tr>${headers}</tr></thead>
@@ -220,7 +220,7 @@ export function renderInteractiveTable(section: TableSection, index: number, les
 
   return renderSectionBlock(
     `
-    ${renderTableCaption('Ã¢Å“ÂÃ¯Â¸Â', section.tableName)}
+    ${renderTableCaption('✏️', section.tableName)}
     <div class="data-table-wrapper" id="${tableId}" data-table-name="${escapeHtml(section.tableName || '')}">
       <table class="data-table" id="${tableId}-table">
         <thead><tr id="${tableId}-header">${headers}${addColHeader}</tr></thead>
@@ -275,8 +275,8 @@ export function renderLabTable(
       <div contenteditable="true" class="col-name-editable" autocapitalize="off" autocorrect="off" spellcheck="false">${escapeHtml(col.name)}</div>
       <span class="col-type">${escapeHtml(col.type)}${col.autoIncrement ? ' AUTO' : ''}</span>
       <div class="col-metadata-toggles">
-        <button class="meta-toggle ${col.isPK ? 'active' : ''}" data-action="toggle-pk" title="Clave primaria">Ã°Å¸â€â€˜</button>
-        <button class="meta-toggle is-fk ${col.isFK ? 'active' : ''}" data-action="toggle-fk" title="Clave forÃƒÂ¡nea">Ã°Å¸â€â€”</button>
+        <button class="meta-toggle ${col.isPK ? 'active' : ''}" data-action="toggle-pk" title="Clave primaria">🔑</button>
+        <button class="meta-toggle is-fk ${col.isFK ? 'active' : ''}" data-action="toggle-fk" title="Clave foránea">🔗</button>
         ${
           col.isFK
             ? `
@@ -303,7 +303,7 @@ export function renderLabTable(
       `
           : ''
       }
-      <button class="lab-col-delete" data-action="delete-col" title="Eliminar columna">Ãƒâ€”</button>
+      <button class="lab-col-delete" data-action="delete-col" title="Eliminar columna">×</button>
     </th>
   `,
     )
@@ -321,7 +321,7 @@ export function renderLabTable(
         )
         .join('')}
       <td class="data-table__extra-col-cell"></td>
-      <td class="lab-row-delete-cell"><button class="lab-row-delete" data-action="delete-row">Ãƒâ€”</button></td>
+      <td class="lab-row-delete-cell"><button class="lab-row-delete" data-action="delete-row">×</button></td>
     </tr>
   `,
     )
@@ -331,8 +331,8 @@ export function renderLabTable(
     `
     <div class="lab-table-header">
       <span class="table-name-display" contenteditable="true" autocapitalize="off" autocorrect="off" spellcheck="false">${escapeHtml(table.tableName)}</span>
-      <span class="edit-icon">Ã¢Å“Å½</span>
-      <button class="lab-table-delete" title="Eliminar tabla">Ãƒâ€”</button>
+      <span class="edit-icon">✎</span>
+      <button class="lab-table-delete" title="Eliminar tabla">×</button>
     </div>
     ${renderLabTableWarning(`${tableId}-warning`)}
     <div class="data-table-wrapper" id="${tableId}" data-table-name="${escapeHtml(table.tableName)}" data-table-id="${escapeHtml(tableId)}">
