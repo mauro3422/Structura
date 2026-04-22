@@ -7,7 +7,8 @@ y el proyecto se adhiere a versionado semÃ¡ntico.
 
 ## Entradas RÃ¡pidas
 
-* [v1.2.21 - Limpieza de encoding visible en tablas](./changelogs/v1.2.21.md) *(actual)*
+* [v1.2.22 - Limpieza final de navegador y favicon](./changelogs/v1.2.22.md) *(actual)*
+* [v1.2.21 - Limpieza de encoding visible en tablas](./changelogs/v1.2.21.md)
 * [v1.2.20 - Ayuda contextual por chip en reglas](./changelogs/v1.2.20.md)
 * [v1.2.19 - Reglas con ayuda expandible](./changelogs/v1.2.19.md)
 * [v1.2.18 - Reglas apiladas en una sola columna](./changelogs/v1.2.18.md)
