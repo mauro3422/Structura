@@ -14,9 +14,9 @@ export function renderLesson(params: { id: string }) {
 
   installMagicTriggerBridge();
 
-  const sectionsHtml = lessonObj.sections.map((section, i) =>
-    renderLessonSection(section, i, lessonId)
-  ).join('');
+  const sectionsHtml = lessonObj.sections
+    .map((section, i) => renderLessonSection(section, i, lessonId))
+    .join('');
 
   const nextLesson = lessonObj.getNext();
 
@@ -28,7 +28,8 @@ export function renderLesson(params: { id: string }) {
         ✓ Módulo completado — Volver
       </button>`;
 
-  return renderPageShell(`
+  return renderPageShell(
+    `
       ${renderBackButton(mod.title, { id: 'btn-back-module', href: `/module/${mod.id}` })}
       ${renderPageHeader(lessonObj.title, '', {
         children: `
@@ -44,5 +45,7 @@ export function renderLesson(params: { id: string }) {
       <div class="lesson-nav">
         ${nextBtn}
       </div>
-  `, { id: `page-lesson-${lessonId}` });
+  `,
+    { id: `page-lesson-${lessonId}` },
+  );
 }

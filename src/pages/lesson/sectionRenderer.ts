@@ -23,14 +23,20 @@ import type { TableSection } from '../../components/widgets/table/types.ts';
 type SectionRenderer = (section: LessonSection, index: number, lessonId?: string) => string;
 
 export const LESSON_SECTION_RENDERERS: Record<string, SectionRenderer> = {
-  text: (section, index) => renderAnimatedElement('p', parseTextWithTriggers((section as Extract<LessonSection, { type: 'text' }>).content), {
-    index,
-    delayStep: 0.05,
-  }),
-  heading: (section, index) => renderAnimatedElement('h2', (section as Extract<LessonSection, { type: 'heading' }>).content, {
-    index,
-    delayStep: 0.05,
-  }),
+  text: (section, index) =>
+    renderAnimatedElement(
+      'p',
+      parseTextWithTriggers((section as Extract<LessonSection, { type: 'text' }>).content),
+      {
+        index,
+        delayStep: 0.05,
+      },
+    ),
+  heading: (section, index) =>
+    renderAnimatedElement('h2', (section as Extract<LessonSection, { type: 'heading' }>).content, {
+      index,
+      delayStep: 0.05,
+    }),
   info: (section, index) => renderInfoBox(section, index),
   'concept-cards': (section, index) => renderConceptCards(section, index),
   'table-example': (section, index) => renderTableExample(section as TableSection, index),
@@ -53,14 +59,18 @@ export function registerLessonSectionRenderer(type: string, renderer: SectionRen
 }
 
 function renderUnknownLessonSection(section: Partial<LessonSection> | undefined, index: number) {
-  return renderAnimatedElement('div', `
+  return renderAnimatedElement(
+    'div',
+    `
     <strong>Sección no soportada</strong>
     <p>Tipo: <code>${escapeHtml(section?.type || 'desconocido')}</code></p>
-  `, {
-    index,
-    animationClass: 'anim-fade-in',
-    className: 'lesson-section lesson-section--unsupported',
-  });
+  `,
+    {
+      index,
+      animationClass: 'anim-fade-in',
+      className: 'lesson-section lesson-section--unsupported',
+    },
+  );
 }
 
 export function renderLessonSection(section: LessonSection | undefined, index: number, lessonId?: string) {
