@@ -225,8 +225,15 @@ export class LessonBuilder {
   }
 
   /** Add a comparison between two approaches */
-  comparison(left, right) {
-    this._sections.push({ type: 'comparison', left, right });
+  comparison(left, right, options = {}) {
+    this._sections.push({
+      type: 'comparison',
+      left,
+      right,
+      title: options.title || '',
+      summary: options.summary || '',
+      open: options.open === true,
+    });
     return this;
   }
 

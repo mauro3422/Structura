@@ -25,7 +25,9 @@ export function renderCodeBlock(section, index) {
 
 export function renderDiagram(section, index) {
   return renderSectionBlock(`
-      <pre class="mermaid">${escapeHtml(section.code)}</pre>
+      <div class="diagram-canvas">
+        <pre class="mermaid">${escapeHtml(section.code)}</pre>
+      </div>
   `, {
     className: 'diagram-wrapper',
     animationClass: 'anim-slide-up',

@@ -62,6 +62,10 @@ export default new Module({
       .comparison(
         { title: 'Tú escribes', content: 'www.google.com' },
         { title: 'El DNS traduce a', content: '142.250.78.46' },
+        {
+          title: 'Traducción DNS',
+          summary: 'A la izquierda está el nombre que escribís y a la derecha la IP real que entiende la red.',
+        },
       )
       .diagram(`sequenceDiagram
         participant U as 📱 Tu celular
