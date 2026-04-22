@@ -1,0 +1,107 @@
+﻿/* --- Home Page --- */
+.home-hero {
+  text-align: center;
+  padding: var(--sp-10) var(--sp-4) var(--sp-6);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.8s;
+}
+
+.home-hero__glow {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, var(--color-primary-glow) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.home-hero__icon {
+  font-size: 3.5rem;
+  margin-bottom: var(--sp-4);
+  animation: float 3s ease-in-out infinite;
+  position: relative;
+}
+
+.home-hero__title {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--sp-2);
+  position: relative;
+}
+
+.home-hero__subtitle {
+  font-size: var(--text-base);
+  color: var(--text-muted);
+  line-height: 1.5;
+  position: relative;
+}
+
+.home-stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-8);
+  animation: fadeIn 0.6s both 0.3s;
+}
+
+.home-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.home-stat__value {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.home-stat__label {
+  font-size: var(--text-xs);
+  color: var(--text-dimmed);
+}
+
+.home-features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.home-feature {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.home-feature__icon {
+  font-size: 1.2rem;
+}
+
+.home-feature__text {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.home-footer {
+  text-align: center;
+  margin-top: 60px;
+  padding: var(--sp-8) 0 var(--sp-4);
+  font-size: var(--text-xs);
+  color: var(--text-dimmed);
+}
+

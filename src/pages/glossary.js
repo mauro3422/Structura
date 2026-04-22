@@ -3,11 +3,12 @@
  * Aggregates terms from all registered modules
  */
 import { registry } from '../modules/index.js';
+import { renderCollapsibleTerm } from '../components/widgets/index.js';
+import { renderPageHeader, renderPageShell } from '../components/templates.js';
 
 export function renderGlossary() {
   const allTerms = registry.getAllGlossary();
 
-  // Group by category
   const categories = {};
   allTerms.forEach(t => {
     const cat = t.category || 'otros';
@@ -22,7 +23,7 @@ export function renderGlossary() {
     operaciones: { label: 'Operaciones', icon: '⚙️' },
     optimización: { label: 'Optimización', icon: '🚀' },
     algoritmos: { label: 'Algoritmos', icon: '🔍' },
-    historia: { label: 'Historia', icon: '📜' },
+    historia: { label: 'Historia', icon: '📝' },
   };
 
   let index = 0;
@@ -30,17 +31,8 @@ export function renderGlossary() {
     const catInfo = categoryLabels[cat] || { label: cat, icon: '📎' };
     const termsHtml = terms.map((t) => {
       index++;
-      return `
-        <div class="glossary-term card" style="animation: slideUp 0.3s both ${index * 0.05}s" id="glossary-${t.term.toLowerCase().replace(/\s/g, '-')}">
-          <div class="glossary-term__header" onclick="this.parentElement.classList.toggle('glossary-term--expanded')">
-            <span class="glossary-term__name">${t.term}</span>
-            <span class="glossary-term__toggle">+</span>
-          </div>
-          <div class="glossary-term__body">
-            <p>${t.definition}</p>
-          </div>
-        </div>
-      `;
+      const termId = `glossary-${t.term.toLowerCase().replace(/\s/g, '-')}`;
+      return renderCollapsibleTerm(t.term, t.definition, index, termId);
     }).join('');
 
     return `
@@ -51,16 +43,18 @@ export function renderGlossary() {
     `;
   }).join('');
 
-  return `
-    <div class="page" id="page-glossary">
-      <div class="page-header">
-        <h1 class="page-title">Glosario</h1>
-        <p class="page-subtitle">Todos los términos que necesitás saber</p>
-      </div>
+  return renderPageShell(`
+      ${renderPageHeader('Glosario', 'Todos los términos que necesitás saber')}
       <div class="glossary-search-wrapper">
         <input type="text" class="glossary-search" placeholder="🔍 Buscar término..." id="glossary-search-input" />
       </div>
-      ${sectionsHtml}
-    </div>
-  `;
+      <div class="glossary-content">
+        ${sectionsHtml}
+      </div>
+      <div id="glossary-empty" hidden class="empty-state">
+        <div class="empty-state__icon">🔍</div>
+        <div class="empty-state__title">No encontramos nada</div>
+        <div class="empty-state__desc">Probá con otra palabra o borrá el filtro</div>
+      </div>
+  `, { id: 'page-glossary' });
 }

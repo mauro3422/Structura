@@ -3,7 +3,7 @@
  * 
  * Recorre la historia de Internet desde ARPANET hasta la era moderna.
  */
-import { Module, lesson, concept, stat, event, term } from '../../core/Module.js';
+import { Module, lesson, concept, stat, event, term, col } from '../../core/Module.js';
 
 // ─── LECCIONES ────────────────────────────────────────
 
@@ -44,6 +44,13 @@ const importancia = lesson('importancia-internet', 'Importancia del Internet')
     stat('500h', 'Video subido a YouTube por minuto', '📹'),
     stat('95%', 'Tráfico web es móvil en LatAm', '📱'),
   ])
+  .heading('Estructurar la Red')
+  .text('Para que todo el Internet funcione, los datos se organizan en <b>Tablas</b>. Así se guarda tu perfil, tus mensajes y tus fotos.')
+  .magicTable('Usuarios_Ejemplo', 
+    [col('ID', 'INT'), col('Nombre', 'TEXT'), col('País', 'TEXT')],
+    [[1, 'Mauro', 'Argentina'], [2, 'Antigravity', 'Deepmind']],
+    'Una tabla es la base del almacenamiento digital. Permite guardar miles de registros de forma ordenada.'
+  )
   .quiz('¿Por qué es importante Internet para la educación?', [
     'Solo sirve para entretenimiento',
     'Permite acceder a información y cursos desde cualquier lugar',

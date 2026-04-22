@@ -153,6 +153,10 @@ body {
   color: var(--color-primary);
 }
 
+[hidden] {
+  display: none !important;
+}
+
 /* --- Utility Classes --- */
 .page {
   flex: 1;
@@ -277,8 +281,77 @@ body {
   }
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
 .animate-delay-1 { animation-delay: 0.1s; }
 .animate-delay-2 { animation-delay: 0.2s; }
 .animate-delay-3 { animation-delay: 0.3s; }
 .animate-delay-4 { animation-delay: 0.4s; }
 .animate-delay-5 { animation-delay: 0.5s; }
+
+.anim-fade-in {
+  animation: fadeIn var(--anim-duration, 0.4s) both var(--anim-delay, 0s);
+}
+
+.anim-slide-up {
+  animation: slideUp var(--anim-duration, 0.4s) both var(--anim-delay, 0s);
+}
+
+.anim-scale-in {
+  animation: scaleIn var(--anim-duration, 0.4s) both var(--anim-delay, 0s);
+}
+
+.anim-row-slide-in {
+  animation: rowSlideIn var(--anim-duration, 0.4s) both var(--anim-delay, 0s);
+}
+
+.anim-shake {
+  animation: shake var(--anim-duration, 0.4s) both var(--anim-delay, 0s);
+}
+
+.main-content {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.feedback-success,
+.feedback-error {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.feedback-success {
+  background: var(--color-accent-soft);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  color: var(--text-primary);
+}
+
+.feedback-error {
+  background: var(--color-danger-soft);
+  border: 1px solid rgba(244, 63, 94, 0.22);
+  color: var(--text-primary);
+}
+
+.u-flex { display: flex; }
+.u-flex-1 { flex: 1; }
+.u-items-center { align-items: center; }
+.u-justify-between { justify-content: space-between; }
+.u-text-center { text-align: center; }
+.u-gap-2 { gap: var(--sp-2); }
+.u-gap-3 { gap: var(--sp-3); }
+.u-gap-8 { gap: 8px; }
+.u-gap-12 { gap: 12px; }
+.u-mt-2 { margin-top: var(--sp-2); }
+.u-mt-3 { margin-top: var(--sp-3); }
+.u-mt-4 { margin-top: var(--sp-4); }
+.u-mt-6 { margin-top: var(--sp-6); }
+.u-mt-8 { margin-top: var(--sp-8); }
+.u-mt-12 { margin-top: var(--sp-12); }
+.u-mt-60 { margin-top: 60px; }

@@ -1,0 +1,82 @@
+﻿/* --- Bottom Navbar --- */
+.navbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--max-width);
+  height: var(--navbar-height);
+  background: rgba(7, 7, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: var(--z-navbar);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.navbar__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-3);
+  border: none;
+  background: none;
+  color: var(--text-dimmed);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.navbar__item--active {
+  color: var(--color-primary);
+}
+
+.navbar__item--active::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+.navbar__icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.navbar__label {
+  font-weight: 500;
+}
+
+/* --- Back Button --- */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  padding: var(--sp-2) 0;
+  margin-bottom: var(--sp-3);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.back-btn:active {
+  color: var(--text-primary);
+}
+

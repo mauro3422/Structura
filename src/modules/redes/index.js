@@ -3,12 +3,10 @@ import { Module, lesson, concept, term } from '../../core/Module.js';
 export default new Module({
   id: 'redes',
   icon: '🌐',
-  color: 'secondary', // Cyan color
+  color: 'secondary',
   title: 'Redes de Computadoras',
-  description: 'Descubrí cómo funciona Internet, las IPs, Routers y servidores.',
+  description: 'Descubrí cómo funciona Internet, las IPs, routers y servidores.',
   order: 4,
-  
-  // -- LECCIONES DEL MÓDULO --
   lessons: [
     lesson('introduccion-redes', '¿Qué es una Red?')
       .duration('5 min')
@@ -17,7 +15,7 @@ export default new Module({
       .conceptCards([
         concept('💻', 'Nodos', 'Las computadoras, celulares o servidores que forman la red.'),
         concept('🔗', 'Enlaces', 'Los cables de fibra óptica o señales WiFi que los unen.'),
-        concept('🗣️', 'Protocolos', 'El "idioma" que usan para entenderse (ej: HTTP o TCP/IP).', 'secondary')
+        concept('🗣️', 'Protocolos', 'El "idioma" que usan para entenderse (por ejemplo, HTTP o TCP/IP).', 'secondary'),
       ])
       .heading('Topología de Red Estrellada')
       .diagram(`graph TD
@@ -26,7 +24,7 @@ export default new Module({
           R ---|WiFi| C[📱 Celular]
           R ---|Cable| S[(🗄️ Servidor Local)]
       `)
-      .info('Si no existieran las redes, tendrías que pasarme este sistema usando un pendrive en persona. ¡El Internet es solo la red más grande que existe!', { variant: 'accent', icon: '✨' })
+      .info('Si no existieran las redes, tendrías que pasarme este sistema usando un pendrive en persona. ¡Internet es solo la red más grande que existe!', { variant: 'accent', icon: '✨' })
       .build(),
 
     lesson('como-viaja-info', '¿Cómo viaja la información?')
@@ -39,18 +37,18 @@ export default new Module({
           { text: 'Tu celular corta la foto en 1000 paquetes.', icon: '✂️' },
           { text: 'Los paquetes salen por tu router WiFi.', icon: '📡' },
           { text: 'Viajan por cables submarinos a la velocidad de la luz.', icon: '⚡' },
-          { text: 'El celular de tu amigo recibe los 1000 paquetes y re-arma la foto.', icon: '🖼️' }
-        ]
+          { text: 'El celular de tu amigo recibe los 1000 paquetes y re-arma la foto.', icon: '🖼️' },
+        ],
       })
       .quiz(
         '¿Por qué cortamos la información en "paquetes"?',
         [
           'Porque los cables son muy finitos y no entra entera.',
           'Para que si un paquete se pierde, solo reenviamos ese pedacito y no el archivo entero.',
-          'Para que la foto se vea con más calidad.'
+          'Para que la foto se vea con más calidad.',
         ],
         1,
-        '¡Exacto! Es mucho más eficiente reenviar un paquete que se perdió en el camino que tener que mandar la foto de 5MB entera otra vez.'
+        '¡Exacto! Es mucho más eficiente reenviar un paquete que se perdió en el camino que tener que mandar la foto de 5MB entera otra vez.',
       )
       .build(),
 
@@ -63,27 +61,25 @@ export default new Module({
       .text('Como los humanos somos malos recordando números (nadie recuerda que Google es `142.250.78.46`), usamos el **DNS (Domain Name System)**.')
       .comparison(
         { title: 'Tú escribes', content: 'www.google.com' },
-        { title: 'El DNS traduce a', content: '142.250.78.46' }
+        { title: 'El DNS traduce a', content: '142.250.78.46' },
       )
       .diagram(`sequenceDiagram
-        participant U as 📱 Tu Celular
+        participant U as 📱 Tu celular
         participant D as 🌐 Servidor DNS
         participant S as 🗄️ Google (142.250...)
-        
+
         U->>D: 1. ¿Cuál es la IP de google.com?
-        D-->>U: 2. Es 142.250.78.46!
+        D-->>U: 2. ¡Es 142.250.78.46!
         U->>S: 3. Hola 142..., dame la página
         S-->>U: 4. Acá tenés la página web
       `)
       .info('El DNS funciona exactamente igual que la libreta de contactos de tu celular. Vos buscás "Mamá" y el celular marca el número.', { variant: 'secondary' })
-      .build()
+      .build(),
   ],
-
-  // -- GLOSARIO DEL MÓDULO --
   glossary: [
     term('Dirección IP', 'Identificador numérico único asignado a cada dispositivo en una red.', 'redes'),
     term('Router', 'Dispositivo que dirige los paquetes de datos entre diferentes redes para que lleguen a su destino.', 'redes'),
     term('DNS', 'Sistema que traduce nombres de dominio (como google.com) a direcciones IP numéricas.', 'redes'),
-    term('Paquete', 'Pequeña porción en la que se divide la información para ser enviada por la red.', 'redes')
-  ]
+    term('Paquete', 'Pequeña porción en la que se divide la información para ser enviada por la red.', 'redes'),
+  ],
 });

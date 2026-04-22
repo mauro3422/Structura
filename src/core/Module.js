@@ -195,6 +195,29 @@ export class LessonBuilder {
     return this;
   }
 
+  /** Add a magic table that assembles with animation */
+  magicTable(tableName, columns, rows, definition, options = {}) {
+    this._sections.push({ 
+      type: 'magic-table', 
+      tableName, 
+      columns, 
+      rows, 
+      definition,
+      interactive: options.interactive === true,
+      narrative: options.narrative === true
+    });
+    return this;
+  }
+
+  /** Add a table laboratory for free-form table creation */
+  tableLaboratory(initialTables = []) {
+    this._sections.push({
+      type: 'table-laboratory',
+      initialTables
+    });
+    return this;
+  }
+
   /** Add a step-by-step animation (generic) */
   stepAnimation(config) {
     this._sections.push({ type: 'step-animation', ...config });
