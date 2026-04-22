@@ -12,6 +12,7 @@ export interface TableColumn {
 }
 
 export interface TableDefinition {
+  tableId?: string;
   tableName: string;
   columns: TableColumn[];
   rows: TableCellValue[][];

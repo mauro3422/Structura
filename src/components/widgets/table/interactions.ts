@@ -1,6 +1,7 @@
 import { showConfirm } from '../Utils.ts';
 import { getLabState, mutateLabState, runValidation, showStatus, syncLabState, updateRelationships } from './state.ts';
 import type { RenderLabTable, TableColumn } from './types.ts';
+import { createTableId } from './state.ts';
 
 function updateLab(renderLabTable: RenderLabTable, labId: string, mutator: (tables: ReturnType<typeof getLabState>) => boolean | void): void {
   mutateLabState(labId, renderLabTable, mutator);
@@ -29,7 +30,9 @@ export function setupInteractiveTables(renderLabTable: RenderLabTable): void {
 
       if (target.closest('[id$="-add-table"]')) {
         updateLab(renderLabTable, labId, (tables) => {
+          const existingIds = tables.map((table) => table.tableId || '');
           tables.push({
+            tableId: createTableId(labId, tables.length, existingIds),
             tableName: `NuevaTabla_${tables.length + 1}`,
             columns: [
               { name: 'ID', type: 'INT', isPK: true, autoIncrement: true },
@@ -182,7 +185,6 @@ export function setupInteractiveTables(renderLabTable: RenderLabTable): void {
   const activeLab = container.querySelector<HTMLElement>('.table-laboratory');
   if (activeLab) {
     runValidation(activeLab.id);
-    requestAnimationFrame(() => updateRelationships(activeLab.id));
     if (!container._labResizeHandler) {
       container._labResizeHandler = () => {
         document.querySelectorAll<HTMLElement>('.table-laboratory').forEach((lab) => updateRelationships(lab.id));

@@ -23,7 +23,7 @@ describe('Table relationship panel', () => {
             tableName: 'Pedidos',
             columns: [
               { name: 'ID', type: 'INT', isPK: true },
-              { name: 'cliente_id', type: 'INT', isFK: true, references: 'Clientes', cardinality: '1:N' },
+              { name: 'cliente_id', type: 'INT', isFK: true, references: 'table-demo-1', cardinality: '1:N' },
               { name: 'Total', type: 'FLOAT' },
             ],
             rows: [[1, 1, 1500]],
@@ -63,7 +63,7 @@ describe('Table relationship panel', () => {
             tableName: 'Perfiles',
             columns: [
               { name: 'ID', type: 'INT', isPK: true },
-              { name: 'usuario_id', type: 'INT', isFK: true, references: 'Usuarios', cardinality: '1:1' },
+              { name: 'usuario_id', type: 'INT', isFK: true, references: 'table-demo-1-1-1', cardinality: '1:1' },
               { name: 'Bio', type: 'TEXT' },
             ],
             rows: [[1, 1, 'Perfil']],

@@ -8,10 +8,11 @@ export function getLabState(labId: string): TableDefinition[] {
   if (!canvas) return [];
 
   return Array.from(canvas.querySelectorAll<HTMLElement>('.lab-table-item')).map((item) => {
+    const tableId = item.dataset.tableId || '';
     const tableName = item.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || '';
     const wrapper = item.querySelector<HTMLElement>('.data-table-wrapper');
     if (!wrapper) {
-      return { tableName, columns: [], rows: [] };
+      return { tableId, tableName, columns: [], rows: [] };
     }
 
     const columns = Array.from(wrapper.querySelectorAll<HTMLTableCellElement>('thead th'))
@@ -33,7 +34,7 @@ export function getLabState(labId: string): TableDefinition[] {
       return Array.from(tr.querySelectorAll<HTMLTableCellElement>('td[data-col]')).map((td) => td.textContent?.trim() || '');
     });
 
-    return { tableName, columns, rows };
+    return { tableId, tableName, columns, rows };
   });
 }
 
@@ -44,7 +45,6 @@ export function renderCanvas(labId: string, tables: TableDefinition[], renderLab
 
   const lessonId = lab.dataset.lessonId || '';
   canvas.innerHTML = tables.map((table, index) => renderLabTable(table, index, lessonId, tables)).join('');
-  updateRelationships(labId);
 }
 
 function normalizeCardinality(value: string | undefined): string {
@@ -304,10 +304,10 @@ function collectRelationships(labId: string): TableRelationship[] {
   if (!canvas) return [];
 
   const tables = Array.from(canvas.querySelectorAll<HTMLElement>('.lab-table-item'));
-  const names = new Set(
+  const tablesById = new Map(
     tables
-      .map((item) => item.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || '')
-      .filter(Boolean),
+      .map((item) => [item.dataset.tableId || '', item] as const)
+      .filter(([id]) => Boolean(id)),
   );
 
   const relationships: TableRelationship[] = [];
@@ -321,12 +321,12 @@ function collectRelationships(labId: string): TableRelationship[] {
       if (th.dataset.fk !== 'true') return;
 
       const sourceColumn = th.querySelector<HTMLElement>('.col-name-editable')?.textContent?.trim() || 'Columna';
-      const targetTable = th.querySelector<HTMLSelectElement>('.ref-picker')?.value?.trim() || '';
+      const targetTableId = th.querySelector<HTMLSelectElement>('.ref-picker')?.value?.trim() || '';
       const sourceIsPk = th.dataset.pk === 'true';
       const cardinality = normalizeCardinality(th.querySelector<HTMLElement>('.cardinality-toggle')?.textContent?.trim());
       const roles = describeRoles(cardinality);
 
-      if (!targetTable) {
+      if (!targetTableId) {
         relationships.push({
           sourceTable,
           sourceColumn,
@@ -340,13 +340,15 @@ function collectRelationships(labId: string): TableRelationship[] {
         return;
       }
 
-      const targetExists = names.has(targetTable);
+      const targetItem = tablesById.get(targetTableId);
+      const targetExists = Boolean(targetItem);
+      const targetLabel = targetItem?.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || targetTableId;
       const caution = targetExists && cardinality === '1:1' && !sourceIsPk;
 
       relationships.push({
         sourceTable,
         sourceColumn,
-        targetTable,
+        targetTable: targetLabel,
         cardinality,
         sourceRole: roles.sourceRole,
         targetRole: roles.targetRole,
@@ -356,7 +358,7 @@ function collectRelationships(labId: string): TableRelationship[] {
             ? caution
               ? '1:1 detectada. Para que sea estricta, conviene que la FK sea unica o compartida con la PK.'
               : '1:1 detectada. La tabla destino funciona como referencia principal.'
-            : '1:N detectada. La tabla destino actua como maestra y la actual como detalle. Repetir la misma FK en varias filas es normal.'
+          : '1:N detectada. La tabla destino actua como maestra y la actual como detalle. Repetir la misma FK en varias filas es normal.'
           : 'Relacion invalida: la tabla destino no esta disponible en el laboratorio.',
       });
     });
@@ -453,9 +455,9 @@ export function updateRelationships(labId: string): void {
     ths.forEach((th) => {
       if (th.dataset.fk === 'true') {
         const picker = th.querySelector<HTMLSelectElement>('.ref-picker');
-        const targetName = picker?.value;
-        if (targetName) {
-          const targetTable = tables.find((candidate) => candidate.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() === targetName);
+        const targetId = picker?.value;
+        if (targetId) {
+          const targetTable = tables.find((candidate) => candidate.dataset.tableId === targetId);
           if (targetTable) {
             const header = targetTable.querySelector<HTMLElement>('.lab-table-header');
             if (!header) return;

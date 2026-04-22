@@ -11,7 +11,7 @@ import {
   renderStaticRows,
   renderTableCaption,
 } from './markup.ts';
-import { resolveLabTables } from './state.ts';
+import { createTableId, resolveLabTables } from './state.ts';
 import type { RenderLabTable, TableDefinition, TableSection } from './types.ts';
 
 export function renderTableExample(section: TableSection, index: number): string {
@@ -88,7 +88,7 @@ export function renderLabTable(
   lessonId: string,
   allTables: TableDefinition[] = [],
 ): string {
-  const tableId = `lab-table-${lessonId}-${ti}`;
+  const tableId = table.tableId || createTableId(lessonId, ti);
   const columns = table.columns || [];
   const rows = table.rows || [];
 
@@ -116,8 +116,11 @@ export function renderLabTable(
           <select class="ref-picker" data-action="change-ref" aria-label="Tabla referenciada por ${escapeHtml(col.name)}">
             <option value="">Ref: [Seleccionar]</option>
             ${allTables
-              .filter((candidate) => candidate.tableName !== table.tableName)
-              .map((candidate) => `<option value="${escapeHtml(candidate.tableName)}" ${col.references === candidate.tableName ? 'selected' : ''}>${escapeHtml(candidate.tableName)}</option>`)
+              .map((candidate, candidateIndex) => {
+                const candidateId = candidate.tableId || createTableId(lessonId, candidateIndex);
+                if (candidateId === tableId) return '';
+                return `<option value="${escapeHtml(candidateId)}" ${col.references === candidateId ? 'selected' : ''}>${escapeHtml(candidate.tableName)}</option>`;
+              })
               .join('')}
           </select>
         </div>
@@ -156,7 +159,7 @@ export function renderLabTable(
       <button class="lab-table-delete" title="Eliminar tabla">×</button>
     </div>
     ${renderLabTableWarning(`${tableId}-warning`)}
-    <div class="data-table-wrapper" id="${tableId}" data-table-name="${escapeHtml(table.tableName)}">
+    <div class="data-table-wrapper" id="${tableId}" data-table-name="${escapeHtml(table.tableName)}" data-table-id="${escapeHtml(tableId)}">
       <table class="data-table">
         <thead><tr id="${tableId}-header">${headers}<th class="data-table__add-col-th"><button class="data-table__add-col" data-table-id="${tableId}" data-col-count="${columns.length}">+</button></th></tr></thead>
         <tbody id="${tableId}-body">${bodyRows}</tbody>
@@ -171,7 +174,7 @@ export function renderLabTable(
       animationClass: 'anim-slide-up',
       index: ti,
       marginClass: '',
-      attrs: `data-index="${ti}"`,
+      attrs: `data-index="${ti}" data-table-id="${escapeHtml(tableId)}"`,
     },
   );
 }
