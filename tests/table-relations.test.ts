@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { renderTableLaboratory } from '../src/components/widgets/table/renderers.ts';
-import { updateRelationships } from '../src/components/widgets/table/dom.ts';
+import { updateObservations, updateRelationships } from '../src/components/widgets/table/dom.ts';
 
 describe('Table relationship panel', () => {
   it('describes 1:N as master/detail', () => {
@@ -110,5 +110,57 @@ describe('Table relationship panel', () => {
     const panel = main.querySelector('.lab-relations-panel');
     expect(panel?.textContent).toContain('Relacion invalida');
     expect(panel?.textContent).toContain('Falta destino');
+  });
+
+  it('infers N:N through a bridge table with two foreign keys', () => {
+    document.body.innerHTML = '<main id="main-content"></main>';
+    const main = document.getElementById('main-content') as HTMLElement;
+
+    main.innerHTML = renderTableLaboratory(
+      {
+        type: 'table-laboratory',
+        initialTables: [
+          {
+            tableName: 'Alumnos',
+            columns: [
+              { name: 'ID', type: 'INT', isPK: true },
+              { name: 'Nombre', type: 'TEXT' },
+            ],
+            rows: [[1, 'Ana']],
+          },
+          {
+            tableName: 'Materias',
+            columns: [
+              { name: 'ID', type: 'INT', isPK: true },
+              { name: 'Nombre', type: 'TEXT' },
+            ],
+            rows: [[1, 'Matemática']],
+          },
+          {
+            tableName: 'Inscripciones',
+            columns: [
+              { name: 'ID', type: 'INT', isPK: true },
+              { name: 'alumno_id', type: 'INT', isFK: true, references: 'table-demo-1', cardinality: '1:N' },
+              { name: 'materia_id', type: 'INT', isFK: true, references: 'table-demo-2', cardinality: '1:N' },
+              { name: 'Fecha', type: 'DATE' },
+            ],
+            rows: [[1, 1, 1, '2026-04-22']],
+          },
+        ],
+      },
+      0,
+      'demo',
+    );
+
+    updateRelationships('table-lab-demo');
+    updateObservations('table-lab-demo');
+
+    const panel = main.querySelector('.lab-relations-panel');
+    expect(panel?.textContent).toContain('N:N');
+    expect(panel?.textContent).toContain('tabla puente');
+    expect(panel?.textContent).toContain('Inscripciones');
+
+    const observations = main.querySelector('.lab-observations-panel');
+    expect(observations?.textContent).toContain('Tabla puente candidata');
   });
 });

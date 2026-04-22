@@ -41,15 +41,16 @@ function renderLaboratoryRulesPanel(labId: string): string {
             <li>El sistema solo sugiere ordenar nombres inconsistentes.</li>
             <li>Si marcas varias PK, el laboratorio lo interpreta como clave compuesta.</li>
             <li>1:N puede repetirse en detalle sin problema.</li>
+            <li>El laboratorio detecta N:N cuando encuentra una tabla puente con dos FKs a distintas tablas.</li>
           </ul>
         </article>
         <article class="lab-rule-card lab-rule-card--future">
           <div class="lab-rule-card__label">Fase 2</div>
           <div class="lab-rule-card__title">Reglas más estrictas para modelado avanzado</div>
           <ul class="lab-rule-card__list">
-            <li>PK compuestas.</li>
-            <li>Muchos a muchos con tabla puente.</li>
+            <li>PK compuestas más estrictas.</li>
             <li>FK únicas reales para 1:1 estricta.</li>
+            <li>Validaciones más duras para tablas puente con atributos extra.</li>
           </ul>
         </article>
       </div>

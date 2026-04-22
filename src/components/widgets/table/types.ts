@@ -19,13 +19,15 @@ export interface TableDefinition {
 }
 
 export interface TableRelationship {
+  relationshipKind: 'direct' | 'derived';
   sourceTable: string;
   sourceColumn: string;
   targetTable: string;
+  bridgeTable?: string;
   cardinality: string;
   sourceRole: string;
   targetRole: string;
-  status: 'linked' | 'caution' | 'missing-target' | 'missing-reference';
+  status: 'linked' | 'caution' | 'derived' | 'missing-target' | 'missing-reference';
   message: string;
 }
 

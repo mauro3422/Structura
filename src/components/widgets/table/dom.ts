@@ -1,6 +1,19 @@
 import { escapeHtml } from '../Utils.ts';
 import type { RenderLabTable, TableDefinition, TableObservation, TableRelationship } from './types.ts';
 
+interface RelationshipRecord {
+  sourceTableId: string;
+  sourceTable: string;
+  sourceColumn: string;
+  targetTableId: string;
+  targetTable: string;
+  cardinality: string;
+  sourceRole: string;
+  targetRole: string;
+  sourceIsPk: boolean;
+  targetExists: boolean;
+}
+
 export function getLabState(labId: string): TableDefinition[] {
   const lab = document.getElementById(labId);
   if (!lab) return [];
@@ -60,6 +73,66 @@ function describeRoles(cardinality: string): { sourceRole: string; targetRole: s
   }
 
   return { sourceRole: 'Detalle', targetRole: 'Maestra' };
+}
+
+function getTableId(item: HTMLElement): string {
+  return item.dataset.tableId || '';
+}
+
+function getTableName(item: HTMLElement): string {
+  return item.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || '';
+}
+
+function getCardinality(th: HTMLElement): string {
+  return normalizeCardinality(th.querySelector<HTMLElement>('.cardinality-toggle')?.textContent?.trim());
+}
+
+function collectRelationshipRecords(labId: string): RelationshipRecord[] {
+  const canvas = document.getElementById(`${labId}-canvas`);
+  if (!canvas) return [];
+
+  const tables = Array.from(canvas.querySelectorAll<HTMLElement>('.lab-table-item'));
+  const tablesById = new Map(
+    tables
+      .map((item) => [getTableId(item), item] as const)
+      .filter(([id]) => Boolean(id)),
+  );
+
+  const records: RelationshipRecord[] = [];
+
+  tables.forEach((item) => {
+    const sourceTableId = getTableId(item);
+    const sourceTable = getTableName(item);
+    const wrapper = item.querySelector<HTMLElement>('.data-table-wrapper');
+    if (!wrapper) return;
+
+    Array.from(wrapper.querySelectorAll<HTMLTableCellElement>('thead th[data-col-index]')).forEach((th) => {
+      if (th.dataset.fk !== 'true') return;
+
+      const sourceColumn = th.querySelector<HTMLElement>('.col-name-editable')?.textContent?.trim() || 'Columna';
+      const targetTableId = th.querySelector<HTMLSelectElement>('.ref-picker')?.value?.trim() || '';
+      const targetItem = tablesById.get(targetTableId);
+      const targetTable = targetItem?.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || targetTableId;
+      const sourceIsPk = th.dataset.pk === 'true';
+      const cardinality = getCardinality(th);
+      const roles = describeRoles(cardinality);
+
+      records.push({
+        sourceTableId,
+        sourceTable,
+        sourceColumn,
+        targetTableId,
+        targetTable,
+        cardinality,
+        sourceRole: roles.sourceRole,
+        targetRole: roles.targetRole,
+        sourceIsPk,
+        targetExists: Boolean(targetItem),
+      });
+    });
+  });
+
+  return records;
 }
 
 function clearObservationMarks(labId: string): void {
@@ -168,6 +241,8 @@ function collectObservations(labId: string): TableObservation[] {
     const seenColumns = new Set<string>();
     let hasPk = false;
     let pkCount = 0;
+    const fkTargets = new Set<string>();
+    const fkColumns: string[] = [];
 
     columns.forEach((th) => {
       const colName = th.querySelector<HTMLElement>('.col-name-editable')?.textContent?.trim() || '';
@@ -216,6 +291,9 @@ function collectObservations(labId: string): TableObservation[] {
           subject: colName || undefined,
         });
         markColumnObserved(th, 'error');
+      } else if (isFk && targetTable) {
+        fkTargets.add(targetTable);
+        fkColumns.push(colName || 'FK');
       }
 
       if (isFk && targetTable && cardinality === '1:1' && !sourceIsPk) {
@@ -230,6 +308,19 @@ function collectObservations(labId: string): TableObservation[] {
       }
     });
 
+    if (fkColumns.length === 2 && fkTargets.size === 2) {
+      const bridgeTargets = Array.from(fkTargets);
+      observations.push({
+        kind: 'info',
+        title: 'Tabla puente candidata',
+        message: `La tabla "${tableName || 'sin nombre'}" conecta ${bridgeTargets[0]} y ${bridgeTargets[1]}.`,
+        hint: 'Esto suele representar una relacion N:N a traves de una tabla intermedia.',
+        subject: tableName || undefined,
+      });
+      markTableObserved(item, 'info');
+      markTableNameObserved(item, 'info');
+    }
+
     if (pkCount > 1) {
       observations.push({
         kind: 'info',
@@ -242,7 +333,7 @@ function collectObservations(labId: string): TableObservation[] {
       markTableNameObserved(item, 'info');
     }
 
-      if (!hasPk) {
+    if (!hasPk) {
       observations.push({
         kind: 'warning',
         title: 'Falta clave primaria',
@@ -315,90 +406,113 @@ export function renderObservationsPanel(labId: string, observations: TableObserv
   `;
 }
 
-function collectRelationships(labId: string): TableRelationship[] {
-  const canvas = document.getElementById(`${labId}-canvas`);
-  if (!canvas) return [];
+function deriveManyToManyRelationships(records: RelationshipRecord[]): TableRelationship[] {
+  const recordsBySource = new Map<string, RelationshipRecord[]>();
 
-  const tables = Array.from(canvas.querySelectorAll<HTMLElement>('.lab-table-item'));
-  const tablesById = new Map(
-    tables
-      .map((item) => [item.dataset.tableId || '', item] as const)
-      .filter(([id]) => Boolean(id)),
-  );
+  records.forEach((record) => {
+    if (!record.targetExists || !record.targetTableId) return;
+    const list = recordsBySource.get(record.sourceTableId) || [];
+    list.push(record);
+    recordsBySource.set(record.sourceTableId, list);
+  });
 
-  const relationships: TableRelationship[] = [];
+  const derived: TableRelationship[] = [];
 
-  tables.forEach((item) => {
-    const sourceTable = item.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || '';
-    const wrapper = item.querySelector<HTMLElement>('.data-table-wrapper');
-    if (!wrapper) return;
+  recordsBySource.forEach((sourceRecords) => {
+    const uniqueTargets = Array.from(
+      sourceRecords.reduce((map, record) => map.set(record.targetTableId, record), new Map<string, RelationshipRecord>()).values(),
+    );
 
-    Array.from(wrapper.querySelectorAll<HTMLTableCellElement>('thead th[data-col-index]')).forEach((th) => {
-      if (th.dataset.fk !== 'true') return;
+    if (sourceRecords.length !== 2 || uniqueTargets.length !== 2) {
+      return;
+    }
 
-      const sourceColumn = th.querySelector<HTMLElement>('.col-name-editable')?.textContent?.trim() || 'Columna';
-      const targetTableId = th.querySelector<HTMLSelectElement>('.ref-picker')?.value?.trim() || '';
-      const sourceIsPk = th.dataset.pk === 'true';
-      const cardinality = normalizeCardinality(th.querySelector<HTMLElement>('.cardinality-toggle')?.textContent?.trim());
-      const roles = describeRoles(cardinality);
+    const [left, right] = uniqueTargets;
+    const bridgeTable = left.sourceTable;
+    const bridgeLabel = bridgeTable || 'Tabla puente';
 
-      if (!targetTableId) {
-        relationships.push({
-          sourceTable,
-          sourceColumn,
-          targetTable: 'Sin destino',
-          cardinality,
-          sourceRole: 'Origen',
-          targetRole: 'Pendiente',
-          status: 'missing-reference',
-          message: 'Relacion invalida: falta una tabla destino para cerrar el enlace.',
-        });
-        return;
-      }
-
-      const targetItem = tablesById.get(targetTableId);
-      const targetExists = Boolean(targetItem);
-      const targetLabel = targetItem?.querySelector<HTMLElement>('.table-name-display')?.textContent?.trim() || targetTableId;
-      const caution = targetExists && cardinality === '1:1' && !sourceIsPk;
-
-      relationships.push({
-        sourceTable,
-        sourceColumn,
-        targetTable: targetLabel,
-        cardinality,
-        sourceRole: roles.sourceRole,
-        targetRole: roles.targetRole,
-        status: targetExists ? (caution ? 'caution' : 'linked') : 'missing-target',
-        message: targetExists
-          ? cardinality === '1:1'
-            ? caution
-              ? '1:1 detectada. Para que sea estricta, conviene que la FK sea unica o compartida con la PK.'
-              : '1:1 detectada. La tabla destino funciona como referencia principal.'
-          : '1:N detectada. La tabla destino actua como maestra y la actual como detalle. Repetir la misma FK en varias filas es normal.'
-          : 'Relacion invalida: la tabla destino no esta disponible en el laboratorio.',
-      });
+    derived.push({
+      relationshipKind: 'derived',
+      sourceTable: left.targetTable,
+      sourceColumn: 'Relación puente',
+      targetTable: right.targetTable,
+      bridgeTable: bridgeLabel,
+      cardinality: 'N:N',
+      sourceRole: 'N',
+      targetRole: 'N',
+      status: 'derived',
+      message: `N:N inferida vía ${bridgeLabel}. La tabla puente conecta ambos lados.`,
     });
   });
 
-  return relationships;
+  return derived;
+}
+
+function collectRelationships(labId: string): TableRelationship[] {
+  const records = collectRelationshipRecords(labId);
+  const directRelationships = records.map((record) => {
+    if (!record.targetTableId) {
+      return {
+        relationshipKind: 'direct',
+        sourceTable: record.sourceTable,
+        sourceColumn: record.sourceColumn,
+        targetTable: 'Sin destino',
+        cardinality: record.cardinality,
+        sourceRole: 'Origen',
+        targetRole: 'Pendiente',
+        status: 'missing-reference',
+        message: 'Relacion invalida: falta una tabla destino para cerrar el enlace.',
+      } satisfies TableRelationship;
+    }
+
+    const caution = record.targetExists && record.cardinality === '1:1' && !record.sourceIsPk;
+
+    return {
+      relationshipKind: 'direct',
+      sourceTable: record.sourceTable,
+      sourceColumn: record.sourceColumn,
+      targetTable: record.targetTable,
+      cardinality: record.cardinality,
+      sourceRole: record.sourceRole,
+      targetRole: record.targetRole,
+      status: record.targetExists ? (caution ? 'caution' : 'linked') : 'missing-target',
+      message: record.targetExists
+        ? record.cardinality === '1:1'
+          ? caution
+            ? '1:1 detectada. Para que sea estricta, conviene que la FK sea unica o compartida con la PK.'
+            : '1:1 detectada. La tabla destino funciona como referencia principal.'
+          : '1:N detectada. La tabla destino actua como maestra y la actual como detalle. Repetir la misma FK en varias filas es normal.'
+        : 'Relacion invalida: la tabla destino no esta disponible en el laboratorio.',
+    } satisfies TableRelationship;
+  });
+
+  return [...directRelationships, ...deriveManyToManyRelationships(records)];
 }
 
 function renderRelationshipItem(item: TableRelationship): string {
   const stateLabel =
     item.status === 'linked'
       ? 'OK'
-      : item.status === 'caution'
-        ? 'Revisar'
-        : item.status === 'missing-target'
-          ? 'Destino ausente'
-          : 'Falta destino';
+      : item.status === 'derived'
+        ? 'N:N inferida'
+        : item.status === 'caution'
+          ? 'Revisar'
+          : item.status === 'missing-target'
+            ? 'Destino ausente'
+            : 'Falta destino';
+
+  const pairLabel =
+    item.relationshipKind === 'derived'
+      ? `${item.sourceTable} ↔ ${item.targetTable}`
+      : `${item.sourceTable}.${item.sourceColumn} → ${item.targetTable}`;
 
   return `
-    <div class="lab-relation-item lab-relation-item--${item.status}">
+    <div class="lab-relation-item lab-relation-item--${item.status} lab-relation-item--${item.relationshipKind}">
       <div class="lab-relation-item__top">
-        <span class="lab-relation-item__pair">${escapeHtml(item.sourceTable)}.${escapeHtml(item.sourceColumn)} → ${escapeHtml(item.targetTable)}</span>
+        <span class="lab-relation-item__pair">${escapeHtml(pairLabel)}</span>
         <span class="lab-relation-item__badge">${escapeHtml(item.cardinality)}</span>
       </div>
+      ${item.bridgeTable ? `<div class="lab-relation-item__bridge">Vía ${escapeHtml(item.bridgeTable)}</div>` : ''}
       <div class="lab-relation-item__roles">
         <span class="lab-relation-item__role lab-relation-item__role--source">${escapeHtml(item.sourceRole)}</span>
         <span class="lab-relation-item__role lab-relation-item__role--target">${escapeHtml(item.targetRole)}</span>
@@ -412,10 +526,11 @@ function renderRelationshipItem(item: TableRelationship): string {
 }
 
 export function renderRelationshipsPanel(labId: string, relationships: TableRelationship[]): void {
-  const panel = document.getElementById(`${labId}-relations`);
+  const panel = document.getElementById(`${labId}-relations`); 
   if (!panel) return;
 
-  const linkedCount = relationships.filter((item) => item.status === 'linked').length;
+  const linkedCount = relationships.filter((item) => item.status === 'linked' || item.status === 'derived').length;
+  const derivedCount = relationships.filter((item) => item.status === 'derived').length;
   const cautionCount = relationships.filter((item) => item.status === 'caution').length;
   const missingCount = relationships.length - linkedCount - cautionCount;
 
@@ -423,11 +538,12 @@ export function renderRelationshipsPanel(labId: string, relationships: TableRela
     <div class="lab-relations-panel__header">
       <div>
         <div class="lab-relations-panel__title">Panel de relaciones</div>
-        <div class="lab-relations-panel__subtitle">Detecta FKs, destinos, cardinalidad y rol sugerido</div>
+        <div class="lab-relations-panel__subtitle">Detecta FKs, destinos, cardinalidad, N:N y rol sugerido</div>
       </div>
       <div class="lab-relations-panel__stats">
         <span class="lab-relations-panel__chip">${relationships.length} total</span>
         <span class="lab-relations-panel__chip ${missingCount > 0 || cautionCount > 0 ? 'is-warning' : 'is-ok'}">${linkedCount} vinculadas</span>
+        ${derivedCount > 0 ? `<span class="lab-relations-panel__chip is-derived">${derivedCount} N:N</span>` : ''}
         ${cautionCount > 0 ? `<span class="lab-relations-panel__chip is-warning">${cautionCount} a revisar</span>` : ''}
       </div>
     </div>
@@ -440,7 +556,7 @@ export function renderRelationshipsPanel(labId: string, relationships: TableRela
         `
         : `
           <div class="lab-relations-empty">
-            No hay relaciones definidas todavia. Marca una columna como FK y elige su tabla destino para empezar.
+            No hay relaciones definidas todavia. Marca una columna como FK y elige su tabla destino para empezar. Si una tabla conecta dos FKs distintas, el laboratorio la puede interpretar como puente.
           </div>
         `
     }
