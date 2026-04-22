@@ -21,44 +21,57 @@ function renderLaboratoryRulesPanel(labId: string): string {
         <div>
           <div class="lab-rules-panel__title">Reglas del laboratorio</div>
           <div class="lab-rules-panel__subtitle">Lo obligatorio, lo sugerido y lo que dejamos para una fase posterior</div>
+          <div class="lab-rules-panel__hint">Tocá una tarjeta para ver qué significa y cómo aplicarlo.</div>
         </div>
       </div>
       <div class="lab-rules-grid">
-        <article class="lab-rule-card lab-rule-card--required">
-          <div class="lab-rule-card__head">
-            <div class="lab-rule-card__label">Obligatorio</div>
-            <div class="lab-rule-card__title">FK real y PK visible</div>
+        <details class="lab-rule-card lab-rule-card--required">
+          <summary class="lab-rule-card__summary">
+            <span class="lab-rule-card__label">Obligatorio</span>
+            <span class="lab-rule-card__title">FK real y PK visible</span>
+            <span class="lab-rule-card__toggle">Ver</span>
+          </summary>
+          <div class="lab-rule-card__body">
+            <p class="lab-rule-card__description">Sin una FK que apunte a una tabla real, la relación queda incompleta. Cada tabla debería mostrar una PK visible para identificar filas.</p>
+            <ul class="lab-rule-card__list">
+              <li>FK → tabla real</li>
+              <li>PK visible por tabla</li>
+              <li>Nombre único</li>
+            </ul>
           </div>
-          <ul class="lab-rule-card__list">
-            <li>FK → tabla real</li>
-            <li>PK visible por tabla</li>
-            <li>Nombre único</li>
-          </ul>
-        </article>
-        <article class="lab-rule-card lab-rule-card--suggested">
-          <div class="lab-rule-card__head">
-            <div class="lab-rule-card__label">Sugerido</div>
-            <div class="lab-rule-card__title">Nombres claros</div>
+        </details>
+        <details class="lab-rule-card lab-rule-card--suggested">
+          <summary class="lab-rule-card__summary">
+            <span class="lab-rule-card__label">Sugerido</span>
+            <span class="lab-rule-card__title">Nombres claros</span>
+            <span class="lab-rule-card__toggle">Ver</span>
+          </summary>
+          <div class="lab-rule-card__body">
+            <p class="lab-rule-card__description">Podés usar minúsculas, snake_case o camelCase. El laboratorio solo te sugiere ordenar nombres inconsistentes y te ayuda a leer mejor el modelo.</p>
+            <ul class="lab-rule-card__list">
+              <li>snake_case o camelCase</li>
+              <li>Nombres consistentes</li>
+              <li>Varias PK = compuesta</li>
+              <li>1:N repite detalle</li>
+              <li>N:N via tabla puente</li>
+            </ul>
           </div>
-          <ul class="lab-rule-card__list">
-            <li>snake_case o camelCase</li>
-            <li>Nombres consistentes</li>
-            <li>Varias PK = compuesta</li>
-            <li>1:N repite detalle</li>
-            <li>N:N via tabla puente</li>
-          </ul>
-        </article>
-        <article class="lab-rule-card lab-rule-card--future">
-          <div class="lab-rule-card__head">
-            <div class="lab-rule-card__label">Fase 2</div>
-            <div class="lab-rule-card__title">Reglas estrictas</div>
+        </details>
+        <details class="lab-rule-card lab-rule-card--future">
+          <summary class="lab-rule-card__summary">
+            <span class="lab-rule-card__label">Fase 2</span>
+            <span class="lab-rule-card__title">Reglas estrictas</span>
+            <span class="lab-rule-card__toggle">Ver</span>
+          </summary>
+          <div class="lab-rule-card__body">
+            <p class="lab-rule-card__description">Acá irán las reglas de modelado avanzado: PK compuestas reales, FK única para 1:1 y tablas puente con atributos para representar N:N con más rigor.</p>
+            <ul class="lab-rule-card__list">
+              <li>PK compuestas reales</li>
+              <li>FK única para 1:1</li>
+              <li>Puentes con atributos</li>
+            </ul>
           </div>
-          <ul class="lab-rule-card__list">
-            <li>PK compuestas reales</li>
-            <li>FK única para 1:1</li>
-            <li>Puentes con atributos</li>
-          </ul>
-        </article>
+        </details>
       </div>
     </div>
   `;
@@ -70,7 +83,7 @@ export function renderTableExample(section: TableSection, index: number): string
 
   return renderSectionBlock(
     `
-    ${renderTableCaption('📋', section.tableName)}
+    ${renderTableCaption('ðŸ“‹', section.tableName)}
     <div class="data-table-wrapper">
       <table class="data-table">
         <thead><tr>${headers}</tr></thead>
@@ -95,7 +108,7 @@ export function renderInteractiveTable(section: TableSection, index: number, les
 
   return renderSectionBlock(
     `
-    ${renderTableCaption('✏️', section.tableName)}
+    ${renderTableCaption('âœï¸', section.tableName)}
     <div class="data-table-wrapper" id="${tableId}" data-table-name="${escapeHtml(section.tableName || '')}">
       <table class="data-table" id="${tableId}-table">
         <thead><tr id="${tableId}-header">${headers}${addColHeader}</tr></thead>
@@ -150,8 +163,8 @@ export function renderLabTable(
       <div contenteditable="true" class="col-name-editable" autocapitalize="off" autocorrect="off" spellcheck="false">${escapeHtml(col.name)}</div>
       <span class="col-type">${escapeHtml(col.type)}${col.autoIncrement ? ' AUTO' : ''}</span>
       <div class="col-metadata-toggles">
-        <button class="meta-toggle ${col.isPK ? 'active' : ''}" data-action="toggle-pk" title="Clave primaria">🔑</button>
-        <button class="meta-toggle is-fk ${col.isFK ? 'active' : ''}" data-action="toggle-fk" title="Clave foránea">🔗</button>
+        <button class="meta-toggle ${col.isPK ? 'active' : ''}" data-action="toggle-pk" title="Clave primaria">ðŸ”‘</button>
+        <button class="meta-toggle is-fk ${col.isFK ? 'active' : ''}" data-action="toggle-fk" title="Clave forÃ¡nea">ðŸ”—</button>
         ${
           col.isFK
             ? `
@@ -178,7 +191,7 @@ export function renderLabTable(
       `
           : ''
       }
-      <button class="lab-col-delete" data-action="delete-col" title="Eliminar columna">×</button>
+      <button class="lab-col-delete" data-action="delete-col" title="Eliminar columna">Ã—</button>
     </th>
   `,
     )
@@ -196,7 +209,7 @@ export function renderLabTable(
         )
         .join('')}
       <td class="data-table__extra-col-cell"></td>
-      <td class="lab-row-delete-cell"><button class="lab-row-delete" data-action="delete-row">×</button></td>
+      <td class="lab-row-delete-cell"><button class="lab-row-delete" data-action="delete-row">Ã—</button></td>
     </tr>
   `,
     )
@@ -206,8 +219,8 @@ export function renderLabTable(
     `
     <div class="lab-table-header">
       <span class="table-name-display" contenteditable="true" autocapitalize="off" autocorrect="off" spellcheck="false">${escapeHtml(table.tableName)}</span>
-      <span class="edit-icon">✎</span>
-      <button class="lab-table-delete" title="Eliminar tabla">×</button>
+      <span class="edit-icon">âœŽ</span>
+      <button class="lab-table-delete" title="Eliminar tabla">Ã—</button>
     </div>
     ${renderLabTableWarning(`${tableId}-warning`)}
     <div class="data-table-wrapper" id="${tableId}" data-table-name="${escapeHtml(table.tableName)}" data-table-id="${escapeHtml(tableId)}">
