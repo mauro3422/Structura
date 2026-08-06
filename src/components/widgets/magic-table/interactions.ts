@@ -1,3 +1,14 @@
+interface MagicActionDetail {
+  step: string;
+  targetId: string;
+}
+
+function isMagicActionDetail(value: unknown): value is MagicActionDetail {
+  if (!value || typeof value !== 'object') return false;
+  const detail = value as Partial<MagicActionDetail>;
+  return typeof detail.step === 'string' && typeof detail.targetId === 'string';
+}
+
 function updateEvolutionState(card: HTMLElement, state: number) {
   const currentState = Number.parseInt(card.dataset.evolutionState || '0', 10);
   if (state <= currentState && state !== 0) return;
@@ -13,8 +24,8 @@ function bindMagicActionBridge() {
   if (typeof window === 'undefined' || window.magicTableListenerBound) return;
 
   document.addEventListener('magic-action', (event) => {
-    const customEvent = event as CustomEvent<{ step: string; targetId: string }>;
-    const { step, targetId } = customEvent.detail;
+    if (!(event instanceof CustomEvent) || !isMagicActionDetail(event.detail)) return;
+    const { step, targetId } = event.detail;
     const cards = document.querySelectorAll<HTMLElement>(`.magic-table-card[data-table-name="${targetId}"]`);
     cards.forEach((card) => {
       let state = 0;
@@ -53,7 +64,8 @@ export function setupMagicTableInteractivity() {
     });
 
     card.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement | null;
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
       if (card.dataset.evolutionState === '0' && !target?.closest('.node-evolution')) {
         updateEvolutionState(card, 1);
       }

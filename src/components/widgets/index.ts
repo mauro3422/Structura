@@ -9,6 +9,7 @@ export * from './quiz/index.ts';
 export * from './card/index.ts';
 export * from './term/index.ts';
 export * from './magic-table/index.ts';
+export * from './stage/index.ts';
 
 import { setupInteractiveTables } from './table/index.ts';
 import { setupSearchAnimations } from './search/index.ts';

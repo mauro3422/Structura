@@ -30,6 +30,27 @@ describe('Module contracts', () => {
     expect(built.sections[built.sections.length - 1]).toMatchObject({ type: 'comparison', open: true });
   });
 
+  it('allows non persistent table laboratory fixtures', () => {
+    const built = lesson('sandbox', 'Sandbox')
+      .tableLaboratory(
+        [
+          {
+            tableName: 'Ventas',
+            columns: [],
+            rows: [],
+          },
+        ],
+        { persist: false },
+      )
+      .build();
+
+    expect(built.sections[0]).toMatchObject({
+      type: 'table-laboratory',
+      persist: false,
+      initialTables: [{ tableName: 'Ventas' }],
+    });
+  });
+
   it('links lessons inside a module and exposes metadata', () => {
     const mod = new Module({
       id: 'redes',

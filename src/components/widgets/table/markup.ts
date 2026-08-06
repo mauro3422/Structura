@@ -1,21 +1,7 @@
 import { escapeHtml } from '../Utils.ts';
 import { renderSectionBlock } from '../../templates.ts';
 import type { TableCellValue, TableColumn, TableDefinition } from './types.ts';
-
-export function createDefaultLabTable(): TableDefinition {
-  return {
-    tableName: 'MiTabla1',
-    columns: [
-      { name: 'ID', type: 'INT', autoIncrement: true, isPK: true },
-      { name: 'Nombre', type: 'TEXT' },
-    ],
-    rows: [['1', 'Ejemplo']],
-  };
-}
-
-export function createDefaultLabTables(): TableDefinition[] {
-  return [createDefaultLabTable()];
-}
+export { createDefaultLabTable, createDefaultLabTables } from './defaults.ts';
 
 export function renderTableCaption(icon: string, title: string = ''): string {
   return `

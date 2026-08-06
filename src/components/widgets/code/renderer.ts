@@ -1,8 +1,9 @@
 import { escapeHtml } from '../Utils.ts';
 import { renderSectionBlock } from '../../templates.ts';
 import { highlightPseudocode, highlightSQL } from './syntax.ts';
+import type { CodeSection, DiagramSection } from '../../../core/moduleTypes.ts';
 
-export function renderCodeBlock(section: any, index: number) {
+export function renderCodeBlock(section: CodeSection, index: number) {
   let code = escapeHtml(section.code);
 
   if (section.language === 'sql') {
@@ -23,7 +24,7 @@ export function renderCodeBlock(section: any, index: number) {
   });
 }
 
-export function renderDiagram(section: any, index: number) {
+export function renderDiagram(section: DiagramSection, index: number) {
   return renderSectionBlock(`
       <div class="diagram-canvas">
         <pre class="mermaid">${escapeHtml(section.code)}</pre>

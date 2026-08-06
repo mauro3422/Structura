@@ -2,20 +2,27 @@ import type {
   CellValue,
   ComparisonSection,
   ComparisonSide,
+  ComparisonOptions,
   ConceptCard,
   DataTypeItem,
   GlossaryTerm,
   LessonConfig,
   LessonMeta,
   LessonSection,
+  InfoSectionOptions,
   ModuleColor,
   ModuleConfig,
   ModuleMeta,
+  InteractiveTableOptions,
+  MagicTableOptions,
   SearchAnimationSection,
   StatItem,
   StepAnimationSection,
+  StepAnimationConfig,
   TableColumn,
+  TableColumnOptions,
   TableLaboratoryTable,
+  TableLaboratoryOptions,
   TimelineEvent,
 } from './moduleTypes.ts';
 
@@ -23,40 +30,47 @@ export type {
   CellValue,
   ComparisonSection,
   ComparisonSide,
+  ComparisonOptions,
   ConceptCard,
   DataTypeItem,
   GlossaryTerm,
   LessonConfig,
   LessonMeta,
   LessonSection,
+  InfoSectionOptions,
   ModuleColor,
   ModuleConfig,
   ModuleMeta,
+  InteractiveTableOptions,
+  MagicTableOptions,
   SearchAnimationSection,
   StatItem,
   StepAnimationSection,
+  StepAnimationConfig,
   TableColumn,
+  TableColumnOptions,
   TableLaboratoryTable,
+  TableLaboratoryOptions,
   TimelineEvent,
 } from './moduleTypes.ts';
 
 export class Lesson {
-  id: string;
-  title: string;
-  description: string;
-  duration: string;
-  index: number;
-  module: Module;
-  sections: LessonSection[];
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly duration: string;
+  readonly index: number;
+  readonly module: Module;
+  readonly sections: LessonSection[];
 
   constructor(config: LessonConfig, index: number, module: Module) {
     this.id = config.id;
     this.title = config.title;
-    this.description = config.description || '';
-    this.duration = config.duration || '';
+    this.description = config.description ?? '';
+    this.duration = config.duration ?? '';
     this.index = index;
     this.module = module;
-    this.sections = config.sections || [];
+    this.sections = config.sections ? [...config.sections] : [];
   }
 
   getNext(): Lesson | null {
@@ -79,24 +93,24 @@ export class Lesson {
 }
 
 export class Module {
-  id: string;
-  icon: string;
-  color: ModuleColor;
-  title: string;
-  description: string;
-  order: number;
-  lessons: Lesson[];
-  glossary: GlossaryTerm[];
+  readonly id: string;
+  readonly icon: string;
+  readonly color: ModuleColor;
+  readonly title: string;
+  readonly description: string;
+  readonly order: number;
+  readonly lessons: Lesson[];
+  readonly glossary: GlossaryTerm[];
 
   constructor(config: ModuleConfig) {
     this.id = config.id;
-    this.icon = config.icon || '📦';
-    this.color = config.color || 'primary';
+    this.icon = config.icon ?? '📦';
+    this.color = config.color ?? 'primary';
     this.title = config.title;
     this.description = config.description;
-    this.order = config.order || 99;
-    this.lessons = (config.lessons || []).map((lessonConfig, index) => new Lesson(lessonConfig, index, this));
-    this.glossary = config.glossary || [];
+    this.order = config.order ?? 99;
+    this.lessons = (config.lessons ?? []).map((lessonConfig, index) => new Lesson(lessonConfig, index, this));
+    this.glossary = (config.glossary ?? []).map((entry) => ({ ...entry }));
   }
 
   getLesson(lessonId: string): Lesson | null {
@@ -148,32 +162,37 @@ export class LessonBuilder {
     return this;
   }
 
-  info(content: string, { variant = 'primary', icon = '💡' }: { variant?: string; icon?: string } = {}) {
+  info(content: string, { variant = 'primary', icon = '💡' }: InfoSectionOptions = {}) {
     this._sections.push({ type: 'info', content, variant, icon });
     return this;
   }
 
-  conceptCards(items: ConceptCard[]) {
-    this._sections.push({ type: 'concept-cards', items });
+  conceptCards(items: ReadonlyArray<ConceptCard>) {
+    this._sections.push({ type: 'concept-cards', items: items.map((item) => ({ ...item })) });
     return this;
   }
 
-  tableExample(tableName: string, columns: TableColumn[], rows: CellValue[][]) {
-    this._sections.push({ type: 'table-example', tableName, columns, rows });
+  tableExample(tableName: string, columns: ReadonlyArray<TableColumn>, rows: ReadonlyArray<ReadonlyArray<CellValue>>) {
+    this._sections.push({
+      type: 'table-example',
+      tableName,
+      columns: columns.map((column) => ({ ...column })),
+      rows: rows.map((row) => [...row]),
+    });
     return this;
   }
 
   interactiveTable(
     tableName: string,
-    columns: TableColumn[],
-    initialRows: CellValue[][] = [],
-    options: { editable?: boolean; canAddRows?: boolean; canAddColumns?: boolean } = {},
+    columns: ReadonlyArray<TableColumn>,
+    initialRows: ReadonlyArray<ReadonlyArray<CellValue>> = [],
+    options: InteractiveTableOptions = {},
   ) {
     this._sections.push({
       type: 'interactive-table',
       tableName,
-      columns,
-      initialRows,
+      columns: columns.map((column) => ({ ...column })),
+      initialRows: initialRows.map((row) => [...row]),
       editable: options.editable !== false,
       canAddRows: options.canAddRows !== false,
       canAddColumns: options.canAddColumns !== false,
@@ -181,8 +200,8 @@ export class LessonBuilder {
     return this;
   }
 
-  dataTypes(items: DataTypeItem[]) {
-    this._sections.push({ type: 'data-types', items });
+  dataTypes(items: ReadonlyArray<DataTypeItem>) {
+    this._sections.push({ type: 'data-types', items: items.map((item) => ({ ...item })) });
     return this;
   }
 
@@ -196,38 +215,38 @@ export class LessonBuilder {
     return this;
   }
 
-  quiz(question: string, options: string[], correctIndex: number, explanation: string) {
-    this._sections.push({ type: 'quiz', question, options, correctIndex, explanation });
+  quiz(question: string, options: ReadonlyArray<string>, correctIndex: number, explanation: string) {
+    this._sections.push({ type: 'quiz', question, options: [...options], correctIndex, explanation });
     return this;
   }
 
-  timeline(events: TimelineEvent[]) {
-    this._sections.push({ type: 'timeline', events });
+  timeline(events: ReadonlyArray<TimelineEvent>) {
+    this._sections.push({ type: 'timeline', events: events.map((event) => ({ ...event })) });
     return this;
   }
 
-  stats(items: StatItem[]) {
-    this._sections.push({ type: 'stats', items });
+  stats(items: ReadonlyArray<StatItem>) {
+    this._sections.push({ type: 'stats', items: items.map((item) => ({ ...item })) });
     return this;
   }
 
-  searchAnimation(algorithm: string, data: Array<number | string>, target: number | string) {
-    this._sections.push({ type: 'search-animation', algorithm, data, target });
+  searchAnimation(algorithm: string, data: ReadonlyArray<number | string>, target: number | string) {
+    this._sections.push({ type: 'search-animation', algorithm, data: [...data], target });
     return this;
   }
 
   magicTable(
     tableName: string,
-    columns: TableColumn[],
-    rows: CellValue[][],
+    columns: ReadonlyArray<TableColumn>,
+    rows: ReadonlyArray<ReadonlyArray<CellValue>>,
     definition: string,
-    options: { interactive?: boolean; narrative?: boolean } = {},
+    options: MagicTableOptions = {},
   ) {
     this._sections.push({
       type: 'magic-table',
       tableName,
-      columns,
-      rows,
+      columns: columns.map((column) => ({ ...column })),
+      rows: rows.map((row) => [...row]),
       definition,
       interactive: options.interactive === true,
       narrative: options.narrative === true,
@@ -235,28 +254,41 @@ export class LessonBuilder {
     return this;
   }
 
-  tableLaboratory(initialTables: TableLaboratoryTable[] = []) {
+  tableLaboratory(initialTables: ReadonlyArray<TableLaboratoryTable> = [], options: TableLaboratoryOptions = {}) {
     this._sections.push({
       type: 'table-laboratory',
-      initialTables,
+      persist: options.persist !== false,
+      initialTables: initialTables.map((table) => ({
+        ...table,
+        columns: table.columns.map((column) => ({ ...column })),
+        rows: table.rows.map((row) => [...row]),
+      })),
     });
     return this;
   }
 
-  stepAnimation(config: Omit<StepAnimationSection, 'type'>) {
-    this._sections.push({ type: 'step-animation', ...config });
+  stepAnimation(config: StepAnimationConfig) {
+    this._sections.push({
+      type: 'step-animation',
+      ...config,
+      steps: config.steps.map((step) => ({ ...step })),
+    });
     return this;
+  }
+
+  private cloneComparisonSide(side: string | ComparisonSide): string | ComparisonSide {
+    return typeof side === 'string' ? side : { ...side };
   }
 
   comparison(
     left: string | ComparisonSide,
     right: string | ComparisonSide,
-    options: { title?: string; summary?: string; open?: boolean } = {},
+    options: ComparisonOptions = {},
   ) {
     this._sections.push({
       type: 'comparison',
-      left,
-      right,
+      left: this.cloneComparisonSide(left),
+      right: this.cloneComparisonSide(right),
       title: options.title || '',
       summary: options.summary || '',
       open: options.open === true,
@@ -270,7 +302,7 @@ export class LessonBuilder {
       title: this._title,
       description: this._description,
       duration: this._duration,
-      sections: this._sections,
+      sections: [...this._sections],
     };
   }
 }
@@ -279,7 +311,7 @@ export function lesson(id: string, title: string) {
   return new LessonBuilder(id, title);
 }
 
-export function concept(icon: string, title: string, description: string, color = 'primary') {
+export function concept(icon: string, title: string, description: string, color = 'primary'): ConceptCard {
   return { icon, title, description, color };
 }
 
@@ -287,7 +319,7 @@ export function dataType(type: string, name: string, example: string, icon: stri
   return { type, name, example, icon };
 }
 
-export function col(name: string, type: string, options: Record<string, unknown> = {}) {
+export function col(name: string, type: string, options: TableColumnOptions = {}): TableColumn {
   return { name, type, ...options };
 }
 

@@ -5,7 +5,7 @@ export type RouteHandler<T extends RouteParams = RouteParams> = (params: T) => s
  * DataLab Router - Simple hash-based SPA router
  */
 export class Router {
-  private readonly routes = new Map<string, RouteHandler<any>>();
+  private readonly routes = new Map<string, RouteHandler<RouteParams>>();
   private currentRoute: string | null = null;
   private container: HTMLElement | null = null;
   onNavigate: ((hash: string) => void) | null = null;
@@ -21,7 +21,7 @@ export class Router {
   }
 
   on<T extends RouteParams = RouteParams>(path: string, handler: RouteHandler<T>) {
-    this.routes.set(path, handler as RouteHandler<any>);
+    this.routes.set(path, handler as RouteHandler<RouteParams>);
     return this;
   }
 
@@ -78,7 +78,7 @@ export class Router {
     }
   }
 
-  private matchRoute(hash: string): { handler: RouteHandler<any> | undefined; params: RouteParams } {
+  private matchRoute(hash: string): { handler: RouteHandler<RouteParams> | undefined; params: RouteParams } {
     if (this.routes.has(hash)) {
       return { handler: this.routes.get(hash), params: {} };
     }

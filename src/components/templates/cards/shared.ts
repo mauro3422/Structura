@@ -1,13 +1,15 @@
 import { styleAttr, cssVar } from '../style.ts';
+import type { ModuleColor } from '../../../core/Module.ts';
 
-export function moduleBadgeClass(color: string) {
+export function moduleBadgeClass(color: ModuleColor) {
   if (color === 'secondary') return 'badge-secondary';
   if (color === 'accent') return 'badge-accent';
+  if (color === 'warning') return 'badge-primary';
   if (color === 'danger') return 'badge-danger';
   return 'badge-primary';
 }
 
-export function moduleColorVar(color: string) {
+export function moduleColorVar(color: ModuleColor) {
   return `var(--color-${color})`;
 }
 

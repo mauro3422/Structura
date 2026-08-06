@@ -1,14 +1,15 @@
 import { escapeHtml } from '../../widgets/Utils.ts';
+import type { ModuleColor } from '../../../core/Module.ts';
 import { animStyle } from '../style.ts';
 import { moduleBadgeClass, moduleColorVar, progressBar } from './shared.ts';
 
 export interface ModuleCardLike {
   id: string;
-  color: string;
+  color: ModuleColor;
   icon: string;
   title: string;
   description: string;
-  lessons: Array<unknown>;
+  lessons: ReadonlyArray<unknown>;
 }
 
 export interface RenderModuleCardOptions {

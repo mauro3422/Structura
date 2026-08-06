@@ -2,11 +2,15 @@
 @import './components/navigation.css';
 @import './components/actions.css';
 @import './components/content.css';
-@import './components/tables/data-table.css';
+@import './components/stage.css';
+@import './components/tables/data-table-base.css';
 @import './components/tables/laboratory.css';
+@import './components/tables/rules.css';
+@import './components/tables/feedback.css';
+@import './components/tables/observations.css';
 @import './components/tables/relationships.css';
 @import './components/tables/controls.css';
 @import './components/progress.css';
 @import './components/lesson-sections.css';
-@import './components/widgets.css';
+@import './components/search.css';
 @import './components/overlays.css';

@@ -1,8 +1,9 @@
 import { escapeHtml } from '../Utils.ts';
 import { formatInlineMarkdown } from '../../../utils/inlineMarkdown.ts';
 import { renderSectionBlock } from '../../templates.ts';
+import type { ConceptCardsSection, DataTypesSection, InfoSection, StatsSection } from '../../../core/moduleTypes.ts';
 
-export function renderInfoBox(section: any, index: number) {
+export function renderInfoBox(section: InfoSection, index: number) {
   return renderSectionBlock(`
     <span class="info-box__icon">${section.icon || '💡'}</span>
     ${formatInlineMarkdown(section.content)}
@@ -13,8 +14,8 @@ export function renderInfoBox(section: any, index: number) {
   });
 }
 
-export function renderConceptCards(section: any, index: number) {
-  const cards = (section.items || []).map((item: any, i: number) => renderSectionBlock(`
+export function renderConceptCards(section: ConceptCardsSection, index: number) {
+  const cards = section.items.map((item, i) => renderSectionBlock(`
     <div class="concept-card__header">
       <div class="concept-card__icon-wrapper">
         <span class="concept-card__icon concept-card__icon--${item.color || 'primary'}">${item.icon}</span>
@@ -34,8 +35,8 @@ export function renderConceptCards(section: any, index: number) {
   return `<div class="concept-cards-grid premium-grid u-mt-6">${cards}</div>`;
 }
 
-export function renderBadgeList(section: any, index: number) {
-  const items = (section.items || []).map((item: any, i: number) => renderSectionBlock(`
+export function renderBadgeList(section: DataTypesSection, index: number) {
+  const items = section.items.map((item, i) => renderSectionBlock(`
     <div class="data-type-item__icon-box">${item.icon}</div>
     <div class="data-type-item__content">
       <span class="data-type-item__name">${escapeHtml(item.name)}</span>
@@ -54,8 +55,8 @@ export function renderBadgeList(section: any, index: number) {
   return `<div class="data-types-list premium-list-container u-mt-4">${items}</div>`;
 }
 
-export function renderStats(section: any, index: number) {
-  const items = (section.items || []).map((item: any, i: number) => renderSectionBlock(`
+export function renderStats(section: StatsSection, index: number) {
+  const items = section.items.map((item, i) => renderSectionBlock(`
     <span class="stat-card__icon">${item.icon}</span>
     <span class="stat-card__value">${escapeHtml(String(item.value))}</span>
     <span class="stat-card__label">${escapeHtml(item.label)}</span>

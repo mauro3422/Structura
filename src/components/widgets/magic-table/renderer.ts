@@ -1,6 +1,7 @@
 import { renderMagicHeader, renderMagicRows, renderMagicTableFrame } from './markup.ts';
+import type { MagicTableSection } from '../../../core/moduleTypes.ts';
 
-export function renderMagicTable(section: any, index: number, lessonId: string) {
+export function renderMagicTable(section: MagicTableSection, index: number, lessonId: string) {
   const tableId = `magic-table-${lessonId}-${index}`;
   const isNarrative = section.narrative === true;
   const tableName = section.tableName || 'default';

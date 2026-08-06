@@ -1,4 +1,4 @@
-﻿/* --- Stats Grid --- */
+/* --- Stats Grid --- */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -106,4 +106,3 @@
   text-align: center;
   min-height: 20px;
 }
-

@@ -1,11 +1,12 @@
 import { registry } from '../modules/index.ts';
 import { renderCollapsibleTerm } from '../components/widgets/index.ts';
 import { renderPageHeader, renderPageShell } from '../components/templates.ts';
+import type { GlossaryTerm } from '../core/moduleTypes.ts';
 
 export function renderGlossary() {
   const allTerms = registry.getAllGlossary();
 
-  const categories: Record<string, typeof allTerms> = {};
+  const categories: Record<string, GlossaryTerm[]> = {};
   allTerms.forEach((term) => {
     const category = term.category || 'otros';
     if (!categories[category]) categories[category] = [];
@@ -27,7 +28,7 @@ export function renderGlossary() {
     const categoryInfo = categoryLabels[category] || { label: category, icon: '📎' };
     const termsHtml = terms.map((term) => {
       index += 1;
-      const termId = `glossary-${term.term.toLowerCase().replace(/\s/g, '-')}`;
+      const termId = `glossary-${term.term.toLowerCase().trim().replace(/\s+/g, '-')}`;
       return renderCollapsibleTerm(term.term, term.definition, index, termId);
     }).join('');
 

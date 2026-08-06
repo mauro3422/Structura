@@ -1,6 +1,7 @@
-export type ModuleColor = 'primary' | 'secondary' | 'accent' | 'warning' | 'danger' | string;
+export type ModuleColor = 'primary' | 'secondary' | 'accent' | 'warning' | 'danger';
 
 export type CellValue = string | number | boolean | null;
+export type TableCardinality = '1:1' | '1:N' | 'N:N';
 
 export interface ConceptCard {
   icon: string;
@@ -15,9 +16,12 @@ export interface TableColumn {
   isPK?: boolean;
   isFK?: boolean;
   autoIncrement?: boolean;
+  references?: string | null;
+  cardinality?: TableCardinality;
   placeholder?: string;
-  [key: string]: unknown;
 }
+
+export type TableColumnOptions = Omit<TableColumn, 'name' | 'type'>;
 
 export interface DataTypeItem {
   type: string;
@@ -50,13 +54,50 @@ export interface ComparisonSide {
   content?: string;
 }
 
+export interface InfoSectionOptions {
+  variant?: string;
+  icon?: string;
+}
+
+export interface InteractiveTableOptions {
+  editable?: boolean;
+  canAddRows?: boolean;
+  canAddColumns?: boolean;
+}
+
+export interface MagicTableOptions {
+  interactive?: boolean;
+  narrative?: boolean;
+}
+
+export interface ComparisonOptions {
+  title?: string;
+  summary?: string;
+  open?: boolean;
+}
+
+export interface StepAnimationConfig extends Omit<StepAnimationSection, 'type'> {}
+
 export interface StepAnimationStep {
   text?: string;
   icon?: string;
 }
 
 export interface TableLaboratoryTable {
-  [key: string]: unknown;
+  tableId?: string;
+  tableName: string;
+  columns: TableColumn[];
+  rows: CellValue[][];
+  x?: number;
+  y?: number;
+}
+
+export interface ProgressLessonLike {
+  id: string;
+}
+
+export interface ProgressModuleLike {
+  lessons: ProgressLessonLike[];
 }
 
 export interface TextSection {
@@ -153,6 +194,11 @@ export interface MagicTableSection {
 export interface TableLaboratorySection {
   type: 'table-laboratory';
   initialTables: TableLaboratoryTable[];
+  persist?: boolean;
+}
+
+export interface TableLaboratoryOptions {
+  persist?: boolean;
 }
 
 export interface StepAnimationSection {

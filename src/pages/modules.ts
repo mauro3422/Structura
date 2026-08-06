@@ -7,28 +7,20 @@ import {
   cssVar,
   progressBar,
   renderLessonCard,
-  renderModuleCard,
   renderBackButton,
   renderPageHeader,
   renderPageShell,
   styleAttr,
 } from '../components/templates.ts';
+import { renderModuleCards } from './moduleCards.ts';
 
 export function renderModules() {
   const modules = registry.getAll();
 
-  const moduleCards = modules
-    .map((mod, i) => renderModuleCard(mod, {
-      index: i,
-      idPrefix: 'module-card',
-      progress: Progress.getModuleProgress(mod),
-    }))
-    .join('');
-
   return renderPageShell(`
       ${renderPageHeader('Módulos', 'Elegí un tema para empezar a aprender')}
       <div class="modules-grid">
-        ${moduleCards}
+        ${renderModuleCards(modules, { idPrefix: 'module-card' })}
       </div>
   `, { id: 'page-modules' });
 }

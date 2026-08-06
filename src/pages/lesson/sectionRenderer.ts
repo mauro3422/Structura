@@ -18,45 +18,6 @@ import { escapeHtml } from '../../components/widgets/Utils.ts';
 import { renderComparison, renderStepAnimation } from './sections/index.ts';
 import { parseTextWithTriggers } from './triggers.ts';
 import type { LessonSection } from '../../core/Module.ts';
-import type { TableSection } from '../../components/widgets/table/types.ts';
-
-type SectionRenderer = (section: LessonSection, index: number, lessonId?: string) => string;
-
-export const LESSON_SECTION_RENDERERS: Record<string, SectionRenderer> = {
-  text: (section, index) =>
-    renderAnimatedElement(
-      'p',
-      parseTextWithTriggers((section as Extract<LessonSection, { type: 'text' }>).content),
-      {
-        index,
-        delayStep: 0.05,
-      },
-    ),
-  heading: (section, index) =>
-    renderAnimatedElement('h2', (section as Extract<LessonSection, { type: 'heading' }>).content, {
-      index,
-      delayStep: 0.05,
-    }),
-  info: (section, index) => renderInfoBox(section, index),
-  'concept-cards': (section, index) => renderConceptCards(section, index),
-  'table-example': (section, index) => renderTableExample(section as TableSection, index),
-  'interactive-table': (section, index, lessonId) => renderInteractiveTable(section as TableSection, index, lessonId ?? ''),
-  'data-types': (section, index) => renderBadgeList(section, index),
-  code: (section, index) => renderCodeBlock(section, index),
-  quiz: (section, index, lessonId) => renderQuiz(section, index, lessonId ?? ''),
-  timeline: (section, index) => renderTreeWidget(section, index),
-  stats: (section, index) => renderStats(section, index),
-  'search-animation': (section, index, lessonId) => renderSearchAnimation(section, index, lessonId ?? ''),
-  diagram: (section, index) => renderDiagram(section, index),
-  'magic-table': (section, index, lessonId) => renderMagicTable(section, index, lessonId ?? ''),
-  'table-laboratory': (section, index, lessonId) => renderTableLaboratory(section as TableSection, index, lessonId ?? ''),
-  'step-animation': (section, index) => renderStepAnimation(section as never, index),
-  comparison: (section, index) => renderComparison(section as never, index),
-};
-
-export function registerLessonSectionRenderer(type: string, renderer: SectionRenderer) {
-  LESSON_SECTION_RENDERERS[type] = renderer;
-}
 
 function renderUnknownLessonSection(section: Partial<LessonSection> | undefined, index: number) {
   return renderAnimatedElement(
@@ -74,7 +35,52 @@ function renderUnknownLessonSection(section: Partial<LessonSection> | undefined,
 }
 
 export function renderLessonSection(section: LessonSection | undefined, index: number, lessonId?: string) {
-  const type = section?.type;
-  const renderer = type ? LESSON_SECTION_RENDERERS[type] : undefined;
-  return renderer ? renderer(section as LessonSection, index, lessonId) : renderUnknownLessonSection(section, index);
+  if (!section) {
+    return renderUnknownLessonSection(section, index);
+  }
+
+  switch (section.type) {
+    case 'text':
+      return renderAnimatedElement('p', parseTextWithTriggers(section.content), {
+        index,
+        delayStep: 0.05,
+      });
+    case 'heading':
+      return renderAnimatedElement('h2', section.content, {
+        index,
+        delayStep: 0.05,
+      });
+    case 'info':
+      return renderInfoBox(section, index);
+    case 'concept-cards':
+      return renderConceptCards(section, index);
+    case 'table-example':
+      return renderTableExample(section, index);
+    case 'interactive-table':
+      return renderInteractiveTable(section, index, lessonId ?? '');
+    case 'data-types':
+      return renderBadgeList(section, index);
+    case 'code':
+      return renderCodeBlock(section, index);
+    case 'quiz':
+      return renderQuiz(section, index, lessonId ?? '');
+    case 'timeline':
+      return renderTreeWidget(section, index);
+    case 'stats':
+      return renderStats(section, index);
+    case 'search-animation':
+      return renderSearchAnimation(section, index, lessonId ?? '');
+    case 'diagram':
+      return renderDiagram(section, index);
+    case 'magic-table':
+      return renderMagicTable(section, index, lessonId ?? '');
+    case 'table-laboratory':
+      return renderTableLaboratory(section, index, lessonId ?? '');
+    case 'step-animation':
+      return renderStepAnimation(section, index);
+    case 'comparison':
+      return renderComparison(section, index);
+    default:
+      return renderUnknownLessonSection(section, index);
+  }
 }

@@ -31,6 +31,34 @@
   position: relative;
 }
 
+.lab-port {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.95;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 70%, white 30%);
+  background: var(--color-primary-soft);
+  box-shadow: 0 0 0 2px var(--bg-surface);
+  display: none;
+}
+
+.lab-port--source {
+  right: -6px;
+}
+
+.lab-port--target {
+  left: -6px;
+}
+
+.data-table__header-cell[data-fk="true"] .lab-port--source,
+.data-table__header-cell[data-pk="true"] .lab-port--target {
+  display: block;
+}
+
 .data-table th:active {
   background: var(--bg-surface-active);
 }

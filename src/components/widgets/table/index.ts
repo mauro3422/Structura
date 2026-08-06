@@ -2,6 +2,8 @@ export { renderTableExample, renderInteractiveTable, renderTableLaboratory, rend
 export {
   createDefaultLabTable,
   createDefaultLabTables,
+} from './defaults.ts';
+export {
   renderTableCaption,
   renderStaticHeaderCell,
   renderInteractiveHeaderCell,
@@ -18,13 +20,24 @@ export {
   syncLabState,
   renderCanvas,
   updateRelationships,
-  runValidation,
-  showStatus,
   mutateLabState,
 } from './state.ts';
+export { runValidation } from './validation.ts';
+export { showStatus } from './feedback.ts';
 import { renderLabTable } from './renderers.ts';
 import { setupInteractiveTables as setupTableInteractions } from './interactions.ts';
+import { setupGraphNodeDragging, setupGraphViewports, updateGraphStageBounds } from '../stage/index.ts';
+
+function refreshGraphStageBounds(): void {
+  document.querySelectorAll<HTMLElement>('[data-graph-stage]').forEach((stage) => {
+    updateGraphStageBounds(stage.id);
+  });
+}
 
 export function setupInteractiveTables() {
   setupTableInteractions(renderLabTable);
+  refreshGraphStageBounds();
+  setupGraphViewports();
+  setupGraphNodeDragging();
+  queueMicrotask(refreshGraphStageBounds);
 }

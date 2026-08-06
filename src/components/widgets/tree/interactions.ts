@@ -7,8 +7,8 @@ export function setupTreeWidgetInteractivity() {
 
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        const thisNode = btn.closest('.tree-node') as HTMLElement | null;
-        if (!thisNode) return;
+        const thisNode = btn.closest('.tree-node');
+        if (!(thisNode instanceof HTMLElement)) return;
 
         if (thisNode.classList.contains('visible') && !btn.dataset.clicked) {
           tree.querySelectorAll<HTMLElement>('.tree-node.focused').forEach((node) => {

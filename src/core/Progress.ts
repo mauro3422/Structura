@@ -1,8 +1,10 @@
+import type { ProgressModuleLike } from './moduleTypes.ts';
+
 export interface ProgressApi {
   getCompletedLessons(): string[];
   markLessonCompleted(lessonId: string): void;
   isLessonCompleted(lessonId: string): boolean;
-  getModuleProgress(module: { lessons: Array<{ id: string }> } | null | undefined): number;
+  getModuleProgress(module: ProgressModuleLike | null | undefined): number;
 }
 
 const STORAGE_KEY = 'datalab_completed_lessons';

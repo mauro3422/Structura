@@ -1,0 +1,99 @@
+.graph-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.graph-stage__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-soft);
+}
+
+.graph-stage__controls-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.graph-stage__status {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-left: auto;
+}
+
+.graph-stage__zoom {
+  min-width: 3.75rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+}
+
+.graph-stage__hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.graph-stage__frame,
+.lab-canvas-wrapper__frame {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: clamp(30rem, 76vh, 54rem);
+  min-height: 28rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at top left, rgba(110, 167, 255, 0.08), transparent 36%),
+    radial-gradient(circle at bottom right, rgba(40, 212, 155, 0.08), transparent 34%),
+    var(--bg-surface);
+  cursor: grab;
+}
+
+.graph-stage__frame.is-panning {
+  cursor: grabbing;
+}
+
+.graph-stage__surface,
+.lab-canvas {
+  position: relative;
+  display: inline-block;
+  min-width: 100%;
+  min-height: 100%;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.graph-stage__surface .lab-svg-layer,
+.lab-canvas .lab-svg-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+
+.graph-stage__frame .lab-table-item,
+.lab-canvas .lab-table-item {
+  position: absolute;
+  z-index: 2;
+}
+
+.graph-stage__frame .lab-table-item.is-dragging,
+.lab-canvas .lab-table-item.is-dragging {
+  z-index: 20;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+}

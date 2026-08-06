@@ -1,36 +1,82 @@
-import { showConfirm } from '../Utils.ts';
-import { getLabState, mutateLabState, runValidation, showStatus, syncLabState, updateRelationships } from './state.ts';
-import type { RenderLabTable, TableColumn } from './types.ts';
-import { createTableId } from './state.ts';
+import { dispatchLabClick } from './commands.ts';
+import { getLabState, mutateLabState, syncLabState, updateRelationships } from './state.ts';
+import { runValidation } from './validation.ts';
+import type { RenderLabTable } from './types.ts';
 
-function updateLab(renderLabTable: RenderLabTable, labId: string, mutator: (tables: ReturnType<typeof getLabState>) => boolean | void): void {
-  mutateLabState(labId, renderLabTable, mutator);
-}
+const autosaveTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
+const resizeHandlers = new WeakMap<HTMLElement, () => void>();
+const relationshipRefreshTimers = new WeakMap<HTMLElement, number>();
+const scheduleFrame =
+  typeof window.requestAnimationFrame === 'function'
+    ? window.requestAnimationFrame.bind(window)
+    : (callback: FrameRequestCallback) => window.setTimeout(() => callback(performance.now()), 0);
+const cancelFrame =
+  typeof window.cancelAnimationFrame === 'function'
+    ? window.cancelAnimationFrame.bind(window)
+    : (handle: number) => window.clearTimeout(handle);
 
 function getTargetLab(target: HTMLElement): HTMLElement | null {
   return target.closest('.table-laboratory') as HTMLElement | null;
 }
 
-function updateRuleHelp(chip: HTMLElement): void {
-  const card = chip.closest('.lab-rule-card') as HTMLElement | null;
-  if (!card) return;
+function scheduleAutosave(container: HTMLElement, labId: string): void {
+  const previousTimer = autosaveTimers.get(container);
+  if (previousTimer) clearTimeout(previousTimer);
 
-  const title = chip.getAttribute('data-rule-help-title') || 'Ayuda rápida';
-  const text = chip.getAttribute('data-rule-help-text') || 'Tocá otro chip para ver una pista distinta.';
+  const timer = setTimeout(() => {
+    syncLabState(labId, getLabState(labId));
+    autosaveTimers.delete(container);
+  }, 1000);
 
-  const titleEl = card.querySelector<HTMLElement>('[data-rule-help-title]');
-  const textEl = card.querySelector<HTMLElement>('[data-rule-help-text]');
+  autosaveTimers.set(container, timer);
+}
 
-  if (titleEl) titleEl.textContent = title;
-  if (textEl) textEl.textContent = text;
+function ensureResizeHandler(container: HTMLElement): void {
+  if (resizeHandlers.has(container)) return;
 
-  card.querySelectorAll<HTMLElement>('.lab-rule-chip').forEach((button) => {
-    button.classList.remove('is-active');
-    button.setAttribute('aria-pressed', 'false');
+  const handler = () => {
+    document.querySelectorAll<HTMLElement>('.table-laboratory').forEach((lab) => updateRelationships(lab.id));
+  };
+
+  resizeHandlers.set(container, handler);
+  window.addEventListener('resize', handler);
+}
+
+function handleTableHover(event: MouseEvent): void {
+  const target = event.target as HTMLElement;
+  const metaFk = target.closest('.meta-toggle.is-fk');
+  if (!metaFk) return;
+
+  const th = metaFk.closest('th');
+  const tableItem = metaFk.closest('.lab-table-item') as HTMLElement;
+  if (!th || !tableItem) return;
+
+  const relId = `rel-${tableItem.dataset.tableId}-${th.dataset.colIndex}`;
+  const path = document.querySelector(`[data-rel-id="${relId}"]`);
+  if (path) path.classList.add('is-active');
+}
+
+function clearRelationshipHover(event: MouseEvent): void {
+  const target = event.target as HTMLElement;
+  const metaFk = target.closest('.meta-toggle.is-fk');
+  if (!metaFk) return;
+
+  document.querySelectorAll('.rel-line.is-active').forEach((path) => path.classList.remove('is-active'));
+}
+
+function scheduleRelationshipRefresh(labId: string): void {
+  const lab = document.getElementById(labId);
+  if (!lab) return;
+
+  const previous = relationshipRefreshTimers.get(lab);
+  if (previous) cancelFrame(previous);
+
+  const next = scheduleFrame(() => {
+    relationshipRefreshTimers.delete(lab);
+    updateRelationships(labId);
   });
 
-  chip.classList.add('is-active');
-  chip.setAttribute('aria-pressed', 'true');
+  relationshipRefreshTimers.set(lab, next);
 }
 
 export function setupInteractiveTables(renderLabTable: RenderLabTable): void {
@@ -48,150 +94,20 @@ export function setupInteractiveTables(renderLabTable: RenderLabTable): void {
       const target = event.target;
       const lab = getTargetLab(target);
       if (!lab) return;
-      const labId = lab.id;
+      const handled = await dispatchLabClick(target, lab.id, renderLabTable);
+      if (handled) return;
 
-      const ruleChip = target.closest('.lab-rule-chip') as HTMLElement | null;
-      if (ruleChip) {
-        event.preventDefault();
-        updateRuleHelp(ruleChip);
-        return;
-      }
-
-      if (target.closest('[id$="-add-table"]')) {
-        updateLab(renderLabTable, labId, (tables) => {
-          const existingIds = tables.map((table) => table.tableId || '');
-          tables.push({
-            tableId: createTableId(labId, tables.length, existingIds),
-            tableName: `NuevaTabla_${tables.length + 1}`,
-            columns: [
-              { name: 'ID', type: 'INT', isPK: true, autoIncrement: true },
-              { name: 'C1', type: 'TEXT' },
-            ],
-            rows: [['1', '']],
-          });
-        });
-        return;
-      }
-
-      const delTableBtn = target.closest('.lab-table-delete');
-      if (delTableBtn) {
-        if (await showConfirm('¿Eliminar tabla?', 'Se borrarán todos sus datos y columnas.')) {
-          updateLab(renderLabTable, labId, (tables) => {
-            const tableItem = delTableBtn.closest('.lab-table-item') as HTMLElement | null;
-            if (!tableItem) return;
-            const ti = Number.parseInt(tableItem.dataset.index || '0', 10);
-            tables.splice(ti, 1);
-          });
-        }
-        return;
-      }
-
-      const tableItem = target.closest('.lab-table-item') as HTMLElement | null;
-      if (tableItem) {
-        const ti = Number.parseInt(tableItem.dataset.index || '0', 10);
-        const tables = getLabState(labId);
-        const table = tables[ti];
-        if (!table) return;
-
-        if (target.closest('.data-table__add-col')) {
-          updateLab(renderLabTable, labId, (liveTables) => {
-            const liveTable = liveTables[ti];
-            liveTable.columns.push({ name: `Col_${liveTable.columns.length + 1}`, type: 'TEXT' });
-            liveTable.rows.forEach((row) => row.push(''));
-          });
-          return;
-        }
-
-        const delColBtn = target.closest('.lab-col-delete');
-        if (delColBtn) {
-          const th = delColBtn.closest('th') as HTMLElement | null;
-          if (!th) return;
-          const ci = Number.parseInt(th.dataset.colIndex || '0', 10);
-          const col = table.columns[ci];
-          if (table.columns.length <= 1) {
-            showStatus(labId, 'La tabla necesita al menos una columna');
-            return;
-          }
-          if (
-            col?.isPK &&
-            !(await showConfirm(
-              '¿Eliminar clave primaria?',
-              'Esta columna identifica los registros. Si la eliminas, la tabla quedará sin PK hasta que marques otra.',
-            ))
-          ) {
-            return;
-          }
-          updateLab(renderLabTable, labId, (liveTables) => {
-            const liveTable = liveTables[ti];
-            liveTable.columns.splice(ci, 1);
-            liveTable.rows.forEach((row) => row.splice(ci, 1));
-          });
-          return;
-        }
-
-        if (target.closest('.data-table__add-row')) {
-          updateLab(renderLabTable, labId, (liveTables) => {
-            const liveTable = liveTables[ti];
-            const newRow = liveTable.columns.map((column) => (column.autoIncrement ? (liveTable.rows.length + 1).toString() : ''));
-            liveTable.rows.push(newRow);
-          });
-          return;
-        }
-
-        const delRowBtn = target.closest('.lab-row-delete');
-        if (delRowBtn) {
-          const tr = delRowBtn.closest('tr') as HTMLElement | null;
-          if (!tr) return;
-          const ri = Number.parseInt(tr.dataset.row || '0', 10);
-          updateLab(renderLabTable, labId, (liveTables) => {
-            const liveTable = liveTables[ti];
-            liveTable.rows.splice(ri, 1);
-          });
-          return;
-        }
-
-        const meta = target.closest('.meta-toggle');
-        if (meta) {
-          event.preventDefault();
-          const action = meta.getAttribute('data-action');
-          const th = meta.closest('th') as HTMLElement | null;
-          if (!th) return;
-          const ci = Number.parseInt(th.dataset.colIndex || '0', 10);
-
-          updateLab(renderLabTable, labId, (liveTables) => {
-            const liveTable = liveTables[ti];
-            const col = liveTable.columns[ci] as TableColumn | undefined;
-            if (!col) return;
-            if (action === 'toggle-pk') {
-              col.isPK = !col.isPK;
-            } else if (action === 'toggle-fk') {
-              col.isFK = !col.isFK;
-            }
-          });
-          return;
-        }
-
-        const cardBtn = target.closest('.cardinality-toggle');
-        if (cardBtn) {
-          const th = cardBtn.closest('th') as HTMLElement | null;
-          if (!th) return;
-          const ci = Number.parseInt(th.dataset.colIndex || '0', 10);
-          updateLab(renderLabTable, labId, (liveTables) => {
-            const liveTable = liveTables[ti];
-            const col = liveTable.columns[ci] as TableColumn | undefined;
-            if (!col) return;
-            col.cardinality = col.cardinality === '1:1' ? '1:N' : '1:1';
-          });
-          return;
-        }
-      }
-
-      if (target.closest('[id$="-save"]')) {
-        syncLabState(labId, getLabState(labId));
-        showStatus(labId, '✅ Guardado');
-        return;
+      if (target.hasAttribute('contenteditable')) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
       }
     });
+
+    container.addEventListener('mouseover', handleTableHover);
+    container.addEventListener('mouseout', clearRelationshipHover);
 
     container.addEventListener('change', (event: Event) => {
       if (!(event.target instanceof HTMLElement)) return;
@@ -203,22 +119,40 @@ export function setupInteractiveTables(renderLabTable: RenderLabTable): void {
       if (!(event.target instanceof HTMLElement)) return;
       if (event.target.hasAttribute('contenteditable')) {
         const lab = event.target.closest('.table-laboratory') as HTMLElement | null;
-        if (lab) {
-          clearTimeout(container._saveTo);
-          container._saveTo = setTimeout(() => syncLabState(lab.id, getLabState(lab.id)), 1000);
-        }
+        if (lab) scheduleAutosave(container, lab.id);
       }
+    });
+
+    container.addEventListener('graph-stage-node-move', (event: Event) => {
+      const customEvent = event as CustomEvent<{ stageId?: string }>;
+      const stageId = customEvent.detail?.stageId;
+      if (!stageId) return;
+      const labId = stageId.replace(/-stage$/, '');
+      scheduleRelationshipRefresh(labId);
+    });
+
+    container.addEventListener('graph-stage-node-drop', (event: Event) => {
+      const customEvent = event as CustomEvent<{ stageId?: string; nodeId?: string; x?: number; y?: number }>;
+      const stageId = customEvent.detail?.stageId;
+      const nodeId = customEvent.detail?.nodeId;
+      const x = customEvent.detail?.x;
+      const y = customEvent.detail?.y;
+      if (!stageId || !nodeId || typeof x !== 'number' || typeof y !== 'number') return;
+
+      const labId = stageId.replace(/-stage$/, '');
+      mutateLabState(labId, renderLabTable, (tables) => {
+        const target = tables.find((table) => table.tableId === nodeId);
+        if (!target) return false;
+        target.x = Math.max(16, Math.round(x));
+        target.y = Math.max(16, Math.round(y));
+      });
+      scheduleRelationshipRefresh(labId);
     });
   }
 
   const activeLab = container.querySelector<HTMLElement>('.table-laboratory');
   if (activeLab) {
     runValidation(activeLab.id);
-    if (!container._labResizeHandler) {
-      container._labResizeHandler = () => {
-        document.querySelectorAll<HTMLElement>('.table-laboratory').forEach((lab) => updateRelationships(lab.id));
-      };
-      window.addEventListener('resize', container._labResizeHandler);
-    }
+    ensureResizeHandler(container);
   }
 }

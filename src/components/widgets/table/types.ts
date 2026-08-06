@@ -1,4 +1,5 @@
 export type TableCellValue = string | number | boolean | null | undefined;
+export type TableCardinality = '1:1' | '1:N' | 'N:N';
 
 export interface TableColumn {
   name: string;
@@ -7,7 +8,7 @@ export interface TableColumn {
   isPK?: boolean;
   isFK?: boolean;
   references?: string | null;
-  cardinality?: string;
+  cardinality?: TableCardinality;
   placeholder?: string;
 }
 
@@ -16,7 +17,11 @@ export interface TableDefinition {
   tableName: string;
   columns: TableColumn[];
   rows: TableCellValue[][];
+  x?: number;
+  y?: number;
 }
+
+export type TableDefinitionSeed = Pick<TableDefinition, 'tableName' | 'columns' | 'rows'> & Partial<Pick<TableDefinition, 'tableId'>>;
 
 export interface TableRelationship {
   relationshipKind: 'direct' | 'derived';
@@ -24,7 +29,7 @@ export interface TableRelationship {
   sourceColumn: string;
   targetTable: string;
   bridgeTable?: string;
-  cardinality: string;
+  cardinality: TableCardinality;
   sourceRole: string;
   targetRole: string;
   status: 'linked' | 'caution' | 'derived' | 'missing-target' | 'missing-reference';
@@ -37,6 +42,11 @@ export interface TableObservation {
   message: string;
   hint?: string;
   subject?: string;
+  tableId?: string;
+  tableIds?: string[];
+  tableName?: string;
+  columnIndex?: number;
+  columnName?: string;
 }
 
 export interface TableSection {

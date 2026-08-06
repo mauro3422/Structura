@@ -2,17 +2,11 @@
  * DataLab - Home Page
  */
 import { registry } from '../modules/index.ts';
-import { Progress } from '../core/Progress.ts';
-import { renderModuleCard, renderPageHeader, renderPageShell } from '../components/templates.ts';
+import { renderPageHeader, renderPageShell } from '../components/templates.ts';
+import { renderModuleCards } from './moduleCards.ts';
 
 export function renderHome() {
   const modules = registry.getAll();
-
-  const moduleCards = modules.map((mod, i) => renderModuleCard(mod, {
-    index: i,
-    idPrefix: 'home-module-card',
-    progress: Progress.getModuleProgress(mod),
-  })).join('');
 
   return renderPageShell(`
       <div class="home-hero">
@@ -25,7 +19,7 @@ export function renderHome() {
       <div class="section">
         ${renderPageHeader('¿Qué querés aprender hoy?')}
         <div class="modules-grid">
-          ${moduleCards}
+          ${renderModuleCards(modules, { idPrefix: 'home-module-card' })}
         </div>
       </div>
 

@@ -1,11 +1,8 @@
 import type { Lesson, Module } from './Module.ts';
+import type { GlossaryTerm } from './moduleTypes.ts';
 
 class ModuleRegistry {
-  private _modules: Map<string, Module>;
-
-  constructor() {
-    this._modules = new Map();
-  }
+  private readonly _modules = new Map<string, Module>();
 
   register(mod: Module) {
     this._modules.set(mod.id, mod);
@@ -35,8 +32,8 @@ class ModuleRegistry {
     return null;
   }
 
-  getAllGlossary() {
-    const terms = [];
+  getAllGlossary(): GlossaryTerm[] {
+    const terms: GlossaryTerm[] = [];
     for (const mod of this._modules.values()) {
       terms.push(...mod.glossary);
     }

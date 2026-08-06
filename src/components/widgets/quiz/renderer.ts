@@ -1,7 +1,8 @@
 import { escapeAttr } from '../Utils.ts';
 import { renderSectionBlock } from '../../templates.ts';
+import type { QuizSection } from '../../../core/moduleTypes.ts';
 
-export function renderQuiz(section: any, index: number, lessonId: string) {
+export function renderQuiz(section: QuizSection, index: number, lessonId: string) {
   const quizId = `quiz-${lessonId}-${index}`;
 
   const options = (section.options || []).map((opt: string, i: number) => {

@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local browser diagnostics and generated review output
+.playwright-cli/
+output/
+*.err

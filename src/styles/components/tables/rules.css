@@ -1,0 +1,242 @@
+.lab-rules-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.88), rgba(20, 28, 51, 0.96));
+}
+
+.lab-rules-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-3);
+}
+
+.lab-rules-panel__title {
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.lab-rules-panel__subtitle {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.lab-rules-panel__hint {
+  margin-top: 6px;
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.lab-rules-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+  align-items: stretch;
+}
+
+.lab-rule-card {
+  padding: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: rgba(15, 23, 42, 0.55);
+  overflow: hidden;
+  transition: border-color var(--transition-base), background var(--transition-base), box-shadow var(--transition-base);
+}
+
+.lab-rule-card[open] {
+  background: rgba(18, 31, 63, 0.9);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.18);
+}
+
+.lab-rule-card__summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: var(--sp-2) var(--sp-3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.lab-rule-card__summary::-webkit-details-marker {
+  display: none;
+}
+
+.lab-rule-card--required {
+  border-left: 4px solid var(--color-danger);
+}
+
+.lab-rule-card--suggested {
+  border-left: 4px solid var(--color-primary);
+}
+
+.lab-rule-card--future {
+  border-left: 4px solid var(--color-warning);
+}
+
+.lab-rule-card__label {
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.lab-rule-card__title {
+  margin-top: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+  text-align: right;
+  flex: 1;
+}
+
+.lab-rule-card__toggle {
+  font-size: var(--text-xs);
+  font-weight: 800;
+  color: var(--color-primary);
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+}
+
+.lab-rule-card__body {
+  padding: 0 var(--sp-3) var(--sp-3);
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.lab-rule-card__description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.lab-rule-card__helper {
+  display: grid;
+  gap: 3px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.lab-rule-card__helper-kicker {
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lab-rule-card__helper-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.lab-rule-card__helper-text {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.lab-rule-card__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.lab-rule-card__toolbar-label {
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lab-rule-card__toolbar-copy {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.lab-rule-card__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.lab-rule-card__list li {
+  margin: 0;
+  flex: 1 1 calc(50% - 0.45rem);
+  min-width: 0;
+}
+
+.lab-rule-chip {
+  width: 100%;
+  appearance: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  line-height: 1.2;
+  padding: 0.45rem 0.65rem;
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--transition-base), border-color var(--transition-base), background var(--transition-base), color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.lab-rule-chip:hover,
+.lab-rule-chip:focus-visible,
+.lab-rule-chip.is-active {
+  color: var(--text-primary);
+  border-color: rgba(59, 130, 246, 0.7);
+  background: rgba(59, 130, 246, 0.18);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+.lab-rule-chip:focus-visible {
+  outline: none;
+}
+
+@media (max-width: 720px) {
+  .lab-rules-panel__header {
+    align-items: flex-start;
+  }
+
+  .lab-rule-card__summary {
+    flex-wrap: wrap;
+  }
+
+  .lab-rule-card__title {
+    width: 100%;
+    text-align: left;
+    order: 3;
+  }
+
+  .lab-rule-card__list {
+    gap: 0.5rem;
+  }
+
+  .lab-rule-card__list li {
+    flex-basis: 100%;
+  }
+}

@@ -1,13 +1,12 @@
 import { renderSectionBlock } from '../../templates.ts';
 import { runBinarySearch, runLinearSearch } from './logic.ts';
-import type { LessonSection, SearchAnimationSection } from '../../../core/Module.ts';
+import type { SearchAnimationSection } from '../../../core/moduleTypes.ts';
 
-export function renderSearchAnimation(section: LessonSection, index: number, lessonId: string) {
-  const searchSection = section as SearchAnimationSection;
+export function renderSearchAnimation(searchSection: SearchAnimationSection, index: number, lessonId: string) {
   const animId = `search-anim-${lessonId}-${index}`;
   const cells = (searchSection.data || [])
     .map(
-      (val: number | string, i: number) => `
+      (val, i) => `
     <div class="search-cell" id="${animId}-cell-${i}" data-value="${val}">${val}</div>
   `,
     )
